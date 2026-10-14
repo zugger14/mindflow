@@ -29,18 +29,16 @@ import AmbientSoundscapes from './components/AmbientSoundscapes';
 import UserAuthPill from './components/UserAuthPill';
 import HistoryArchiveViewer from './components/HistoryArchiveViewer';
 import CircadianGuideBanner, { AppIntentMode } from './components/CircadianGuideBanner';
-import QATestLabModal from './components/QATestLabModal';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
 function DashboardContent() {
-  const { activeQAProfile, userVersion } = useAuth();
+  const { userVersion } = useAuth();
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [breathingActive, setBreathingActive] = useState(false);
   const [activeMode, setActiveMode] = useState<AppIntentMode>('focus');
   const [isTimerActive, setIsTimerActive] = useState(false);
   const [isBreakMode, setIsBreakMode] = useState(false);
   const [isArchiveOpen, setIsArchiveOpen] = useState(false);
-  const [isQALabOpen, setIsQALabOpen] = useState(false);
   const [archiveDate, setArchiveDate] = useState<string | undefined>(undefined);
 
   useEffect(() => {
@@ -103,34 +101,15 @@ function DashboardContent() {
           </p>
         </div>
 
-        {/* Header Right Actions: QA Lab + User Auth + Past Archive */}
+        {/* Header Right Actions: User Auth + Past Archive */}
         <div className="flex items-center gap-2.5 flex-wrap self-start lg:self-auto">
-          {/* QA Test Lab Suite Button */}
-          <button
-            onClick={() => setIsQALabOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-2xl bg-emerald-50/90 backdrop-blur-md border border-emerald-300/90 text-emerald-950 hover:bg-emerald-100 shadow-2xs transition-all cursor-pointer"
-            title="Open Comprehensive Multi-User & Firebase QA Test Suite"
-          >
-            <ShieldCheck size={14} className="text-emerald-600" />
-            <span>QA Test Lab</span>
-            {activeQAProfile ? (
-              <span className="text-[10px] font-bold bg-emerald-600 text-white px-1.5 py-0.2 rounded-md">
-                {activeQAProfile.avatarText}
-              </span>
-            ) : (
-              <span className="text-[10px] font-bold bg-emerald-200 text-emerald-800 px-1.5 py-0.2 rounded-md">
-                21 Tests
-              </span>
-            )}
-          </button>
-
           {/* History Archive Button */}
           <button
             onClick={() => {
               setArchiveDate(undefined);
               setIsArchiveOpen(true);
             }}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-2xl bg-white/90 backdrop-blur-md border border-sand-200/90 text-ink-700 hover:text-emerald-800 hover:border-emerald-300 shadow-2xs transition-all"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-2xl bg-white/90 backdrop-blur-md border border-sand-200/90 text-ink-700 hover:text-emerald-800 hover:border-emerald-300 shadow-2xs transition-all cursor-pointer"
             title="Browse past days' logs and run retrospective psychological analysis"
           >
             <Calendar size={13} className="text-emerald-600" />
@@ -138,7 +117,7 @@ function DashboardContent() {
           </button>
 
           {/* User Auth Pill (Firestore sync & status) */}
-          <UserAuthPill onOpenQALab={() => setIsQALabOpen(true)} />
+          <UserAuthPill />
         </div>
       </motion.header>
 
@@ -747,13 +726,6 @@ function DashboardContent() {
           setIsArchiveOpen(false);
           setArchiveDate(undefined);
         }}
-      />
-
-      {/* QA Test Lab & Multi-User Verification Suite */}
-      <QATestLabModal
-        isOpen={isQALabOpen}
-        onClose={() => setIsQALabOpen(false)}
-        onUserDataChanged={triggerStatsRefresh}
       />
     </div>
   );
