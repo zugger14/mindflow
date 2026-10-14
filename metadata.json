@@ -1,0 +1,8 @@
+{
+  "name": "MindFlow",
+  "description": "A minimalist, calming dashboard that helps users manage their tasks using cognitive science principles while offering psychological grounding exercises.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

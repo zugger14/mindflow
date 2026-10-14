@@ -1,0 +1,16 @@
+services:
+  mindflow:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: mindflow:latest
+    container_name: mindflow
+    restart: always
+    ports:
+      - "3020:3020"
+    environment:
+      - NODE_ENV=production
+      - PORT=3020
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - LOCAL_LLM_URL=${LOCAL_LLM_URL:-http://localhost:11434}
+      - LOCAL_LLM_MODEL=${LOCAL_LLM_MODEL:-qwen2.5:7b}

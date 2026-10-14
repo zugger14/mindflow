@@ -1,0 +1,152 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile document",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "createdAt": { "type": "number" },
+        "lastLoginAt": { "type": "number" }
+      },
+      "required": ["uid", "createdAt"]
+    },
+    "EnergyLog": {
+      "title": "EnergyLog",
+      "description": "Daily emotion and somatic energy level check-in",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "date": { "type": "string" },
+        "timestamp": { "type": "number" },
+        "emotion": { "type": "number" },
+        "energy": { "type": "number" },
+        "note": { "type": "string" }
+      },
+      "required": ["id", "userId", "date", "timestamp", "emotion", "energy"]
+    },
+    "CBTEntry": {
+      "title": "CBTEntry",
+      "description": "Cognitive restructuring thought record with distortions and reframe",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "date": { "type": "string" },
+        "timestamp": { "type": "number" },
+        "stressor": { "type": "string" },
+        "distortions": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "reframe": { "type": "string" }
+      },
+      "required": ["id", "userId", "date", "timestamp", "stressor", "distortions", "reframe"]
+    },
+    "TaskItem": {
+      "title": "TaskItem",
+      "description": "Cognitive load task with micro-steps",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "title": { "type": "string" },
+        "completed": { "type": "boolean" },
+        "completedAt": { "type": "number" },
+        "steps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "text": { "type": "string" },
+              "completed": { "type": "boolean" }
+            },
+            "required": ["id", "text", "completed"]
+          }
+        },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["id", "userId", "title", "completed", "steps"]
+    },
+    "BrainDump": {
+      "title": "BrainDump",
+      "description": "Zeigarnik intrusive thought capture",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "text": { "type": "string" },
+        "timestamp": { "type": "number" }
+      },
+      "required": ["id", "userId", "text", "timestamp"]
+    },
+    "FocusSession": {
+      "title": "FocusSession",
+      "description": "Ultradian 90m focus or 20m break session log",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "type": { "type": "string", "enum": ["focus", "break"] },
+        "durationMinutes": { "type": "number" },
+        "timestamp": { "type": "number" }
+      },
+      "required": ["id", "userId", "type", "durationMinutes", "timestamp"]
+    },
+    "FocusAchievement": {
+      "title": "FocusAchievement",
+      "description": "Ultradian 90m block completion focus badge reward",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "badgeId": { "type": "string" },
+        "badgeName": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "category": { "type": "string" },
+        "icon": { "type": "string" },
+        "rarity": { "type": "string" },
+        "earnedAt": { "type": "number" },
+        "completedBlocksCount": { "type": "number" },
+        "neuroInsight": { "type": "string" }
+      },
+      "required": ["id", "userId", "badgeName", "title", "earnedAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profile document"
+    },
+    "/users/{userId}/energyLogs/{logId}": {
+      "schema": "EnergyLog",
+      "description": "User daily energy and emotion entries"
+    },
+    "/users/{userId}/cbtEntries/{entryId}": {
+      "schema": "CBTEntry",
+      "description": "User cognitive restructuring reframes"
+    },
+    "/users/{userId}/tasks/{taskId}": {
+      "schema": "TaskItem",
+      "description": "User active and completed cognitive load priorities"
+    },
+    "/users/{userId}/brainDumps/{dumpId}": {
+      "schema": "BrainDump",
+      "description": "User open-loop distracting thought captures"
+    },
+    "/users/{userId}/focusSessions/{sessionId}": {
+      "schema": "FocusSession",
+      "description": "User completed Ultradian rhythm cycles"
+    },
+    "/users/{userId}/focusAchievements/{badgeId}": {
+      "schema": "FocusAchievement",
+      "description": "User earned Ultradian focus completion badges and achievements"
+    }
+  }
+}

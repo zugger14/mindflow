@@ -1,0 +1,238 @@
+import React, { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { Cloud, LogOut, RefreshCw, ShieldCheck, Users, ChevronDown } from 'lucide-react';
+
+interface UserAuthPillProps {
+  onOpenQALab?: () => void;
+}
+
+export default function UserAuthPill({ onOpenQALab }: UserAuthPillProps) {
+  const { user, loading, activeQAProfile, qaProfiles, switchQAProfile, loginWithGoogle, logout, syncLocalToCloud } = useAuth();
+  const [syncing, setSyncing] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const handleManualSync = async () => {
+    setSyncing(true);
+    await syncLocalToCloud();
+    setTimeout(() => setSyncing(false), 600);
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center gap-2 text-xs text-ink-500 bg-white/80 px-3 py-1.5 rounded-2xl border border-sand-200">
+        <RefreshCw size={13} className="animate-spin text-emerald-500" />
+        <span>Connecting...</span>
+      </div>
+    );
+  }
+
+  // If a QA persona is active
+  if (activeQAProfile) {
+    return (
+      <div className="relative">
+        <button
+          onClick={() => setMenuOpen(!menuOpen)}
+          className="flex items-center gap-2 text-xs font-semibold bg-emerald-50/90 hover:bg-emerald-100/90 text-emerald-950 px-3 py-1.5 rounded-2xl border border-emerald-300 shadow-2xs transition-all cursor-pointer"
+        >
+          <div className="w-5 h-5 rounded-full bg-emerald-700 text-white flex items-center justify-center text-[10px] font-bold">
+            {activeQAProfile.avatarText}
+          </div>
+          <span className="max-w-[120px] truncate">{activeQAProfile.displayName}</span>
+          <span className="text-[10px] bg-emerald-600 text-white px-1.5 py-0.2 rounded-md font-bold">
+            QA
+          </span>
+          <ChevronDown size={12} className="text-emerald-700" />
+        </button>
+
+        {menuOpen && (
+          <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-sand-200 p-3 z-50 space-y-2 text-xs">
+            <div className="pb-2 border-b border-sand-200">
+              <div className="flex items-center justify-between">
+                <p className="font-bold text-ink-900 truncate">{activeQAProfile.displayName}</p>
+                <span className="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">
+                  QA Mode
+                </span>
+              </div>
+              <p className="text-[11px] text-ink-500">{activeQAProfile.title}</p>
+              <p className="text-[10px] text-ink-400 font-mono mt-0.5">{activeQAProfile.email}</p>
+            </div>
+
+            {onOpenQALab && (
+              <button
+                onClick={() => {
+                  setMenuOpen(false);
+                  onOpenQALab();
+                }}
+                className="w-full flex items-center gap-2 px-2.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-900 font-bold transition-colors"
+              >
+                <ShieldCheck size={14} className="text-emerald-600" />
+                <span>Open QA Test Lab Suite</span>
+              </button>
+            )}
+
+            <div className="pt-1">
+              <p className="text-[10px] uppercase font-bold text-ink-400 mb-1.5">Switch QA Persona:</p>
+              <div className="space-y-1">
+                {qaProfiles.map((p) => (
+                  <button
+                    key={p.uid}
+                    onClick={() => {
+                      switchQAProfile(p);
+                      setMenuOpen(false);
+                    }}
+                    className={`w-full flex items-center justify-between px-2 py-1.5 rounded-lg text-[11px] transition-colors ${
+                      activeQAProfile.uid === p.uid ? 'bg-sand-100 font-bold text-ink-900' : 'hover:bg-sand-50 text-ink-700'
+                    }`}
+                  >
+                    <span>{p.displayName}</span>
+                    <span className="text-[10px] text-ink-400 font-mono">{p.streakDays}d streak</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="pt-2 border-t border-sand-200">
+              <button
+                onClick={() => {
+                  switchQAProfile(null);
+                  setMenuOpen(false);
+                }}
+                className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-rose-50 text-rose-600 font-medium transition-colors"
+              >
+                <LogOut size={13} />
+                <span>Exit QA Persona (Personal Data)</span>
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Not signed in with Google
+  if (!user) {
+    return (
+      <div className="flex items-center gap-1.5">
+        {onOpenQALab && (
+          <button
+            onClick={onOpenQALab}
+            className="flex items-center gap-1.5 text-xs font-semibold bg-emerald-50 hover:bg-emerald-100 text-emerald-900 px-3 py-1.5 rounded-2xl border border-emerald-200 shadow-2xs transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+            title="Open Multi-User & Firebase QA Test Suite"
+          >
+            <ShieldCheck size={13} className="text-emerald-600" />
+            <span>QA Lab</span>
+          </button>
+        )}
+
+        <button
+          onClick={loginWithGoogle}
+          className="flex items-center gap-2 text-xs font-semibold bg-white hover:bg-sand-50 text-ink-800 px-3 py-1.5 rounded-2xl border border-sand-200/90 shadow-2xs transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+          title="Sign in with Google to backup data to Firestore"
+        >
+          <svg className="w-3.5 h-3.5" viewBox="0 0 24 24">
+            <path
+              fill="#4285F4"
+              d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.66v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.15z"
+            />
+            <path
+              fill="#34A853"
+              d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"
+            />
+            <path
+              fill="#FBBC05"
+              d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 10.03 0 12s.45 3.82 1.25 5.42l4.03-3.15z"
+            />
+            <path
+              fill="#EA4335"
+              d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"
+            />
+          </svg>
+          <span>Sign In</span>
+        </button>
+      </div>
+    );
+  }
+
+  // Signed in with Google
+  return (
+    <div className="relative">
+      <div className="flex items-center gap-1.5">
+        {onOpenQALab && (
+          <button
+            onClick={onOpenQALab}
+            className="flex items-center gap-1.5 text-xs font-semibold bg-emerald-50 hover:bg-emerald-100 text-emerald-900 px-2.5 py-1.5 rounded-2xl border border-emerald-200 shadow-2xs transition-all cursor-pointer"
+            title="Open Multi-User & Firebase QA Test Suite"
+          >
+            <ShieldCheck size={13} className="text-emerald-600" />
+            <span>QA Lab</span>
+          </button>
+        )}
+
+        <button
+          onClick={() => setMenuOpen(!menuOpen)}
+          className="flex items-center gap-2 text-xs font-medium bg-white/95 hover:bg-sand-50 text-ink-900 px-3 py-1.5 rounded-2xl border border-sand-200/90 shadow-2xs transition-all cursor-pointer"
+        >
+          {user.photoURL ? (
+            <img src={user.photoURL} alt="User" className="w-5 h-5 rounded-full object-cover" />
+          ) : (
+            <div className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center text-[10px] font-bold">
+              {user.displayName ? user.displayName[0] : 'U'}
+            </div>
+          )}
+          <span className="font-semibold text-xs max-w-[120px] truncate">
+            {user.displayName || 'Signed In'}
+          </span>
+          <span className="flex items-center gap-1 text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-semibold">
+            <Cloud size={10} />
+            <span>Synced</span>
+          </span>
+          <ChevronDown size={12} className="text-ink-400" />
+        </button>
+      </div>
+
+      {menuOpen && (
+        <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-sand-200 p-3 z-50 space-y-2 text-xs">
+          <div className="pb-2 border-b border-sand-200">
+            <p className="font-semibold text-ink-900 truncate">{user.displayName || 'MindFlow User'}</p>
+            <p className="text-[11px] text-ink-500 truncate">{user.email}</p>
+          </div>
+
+          <button
+            onClick={handleManualSync}
+            disabled={syncing}
+            className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-xl hover:bg-sand-100 text-ink-700 transition-colors"
+          >
+            <RefreshCw size={14} className={syncing ? 'animate-spin text-emerald-600' : 'text-emerald-600'} />
+            <span>{syncing ? 'Syncing Firestore...' : 'Sync Firestore Now'}</span>
+          </button>
+
+          {onOpenQALab && (
+            <button
+              onClick={() => {
+                setMenuOpen(false);
+                onOpenQALab();
+              }}
+              className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-900 font-semibold transition-colors"
+            >
+              <ShieldCheck size={14} className="text-emerald-600" />
+              <span>QA Test Lab & Personas</span>
+            </button>
+          )}
+
+          <div className="pt-2 border-t border-sand-200">
+            <button
+              onClick={() => {
+                setMenuOpen(false);
+                logout();
+              }}
+              className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-xl hover:bg-rose-50 text-rose-600 transition-colors"
+            >
+              <LogOut size={14} />
+              <span>Sign Out</span>
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

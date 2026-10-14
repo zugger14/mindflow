@@ -1,0 +1,75 @@
+name: Deploy MindFlow to EC2
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  test-and-build:
+    name: Test & Build Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck TypeScript
+        run: npm run lint
+
+      - name: Build Production Bundle
+        run: npm run build
+
+  deploy:
+    name: Deploy to EC2 via Docker
+    needs: test-and-build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Deploy on EC2 via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: ${{ secrets.EC2_PORT || 22 }}
+          script: |
+            set -e
+            echo "==> Deploying MindFlow to EC2..."
+            
+            APP_DIR="${{ secrets.EC2_APP_DIR }}"
+            if [ -z "$APP_DIR" ]; then
+              APP_DIR="$HOME/mindflow"
+            fi
+            
+            # Initial clone if directory does not exist
+            if [ ! -d "$APP_DIR" ]; then
+              echo "==> Cloning MindFlow repository..."
+              git clone https://github.com/${{ github.repository }}.git "$APP_DIR"
+            fi
+
+            cd "$APP_DIR"
+
+            echo "==> Pulling latest changes from main..."
+            git fetch origin main
+            git reset --hard origin/main
+
+            echo "==> Launching MindFlow Docker container on port 3020..."
+            docker compose down || true
+            docker compose up --build -d
+
+            echo "==> Cleaning up dangling images..."
+            docker image prune -f
+
+            echo "==> Verifying MindFlow container..."
+            docker ps --filter "name=mindflow"
+            echo "==> MindFlow successfully deployed!"
