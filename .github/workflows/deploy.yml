@@ -73,3 +73,57 @@ jobs:
             echo "==> Verifying MindFlow container..."
             docker ps --filter "name=mindflow"
             echo "==> MindFlow successfully deployed!"
+
+  deploy-ecs:
+    name: Build, Push to ECR & Restart ECS
+    needs: test-and-build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION || 'us-east-1' }}
+
+      - name: Log in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, Tag & Push Image to ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: mindflow
+          IMAGE_TAG: latest
+        run: |
+          echo "==> Building Docker image for MindFlow..."
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }} .
+          echo "==> Pushing image to ECR..."
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}
+
+      - name: Restart ECS Service with New Code
+        run: |
+          echo "==> Checking if ECS service exists and is active..."
+          CLUSTER_NAME="multiapp-cluster-production"
+          SERVICE_NAME="mindflow-service"
+          REGION="${{ secrets.AWS_REGION || 'us-east-1' }}"
+
+          SERVICE_STATUS=$(aws ecs describe-services --cluster "$CLUSTER_NAME" --services "$SERVICE_NAME" --region "$REGION" --query "services[?status=='ACTIVE'].status" --output text 2>/dev/null || true)
+
+          if [ "$SERVICE_STATUS" = "ACTIVE" ]; then
+            echo "==> Triggering zero-downtime rolling update on ECS service $SERVICE_NAME..."
+            aws ecs update-service \
+              --cluster "$CLUSTER_NAME" \
+              --service "$SERVICE_NAME" \
+              --force-new-deployment \
+              --region "$REGION"
+            echo "==> ECS deployment successfully triggered!"
+          else
+            echo "==> Note: ECS service $SERVICE_NAME is not currently active on $CLUSTER_NAME (skipped service restart)."
+            echo "==> Image is ready in ECR: ${{ steps.login-ecr.outputs.registry }}/mindflow:latest"
+          fi
