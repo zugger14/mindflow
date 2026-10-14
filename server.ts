@@ -14,14 +14,22 @@ const port = process.env.PORT || 3000;
 
 app.use(express.json({ limit: '2mb' }));
 
-const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY || 'AIzaSy_placeholder_key',
-  httpOptions: {
-    headers: {
-      'User-Agent': 'aistudio-build',
+const DEFAULT_GEMINI_KEY = process.env.GEMINI_API_KEY || '';
+
+function getGeminiClient(customApiKey?: string): GoogleGenAI | null {
+  const effectiveKey = (customApiKey && customApiKey.trim().length > 5) ? customApiKey.trim() : DEFAULT_GEMINI_KEY;
+  if (!effectiveKey || effectiveKey === 'AIzaSy_placeholder_key') {
+    return null;
+  }
+  return new GoogleGenAI({
+    apiKey: effectiveKey,
+    httpOptions: {
+      headers: {
+        'User-Agent': 'aistudio-build',
+      },
     },
-  },
-});
+  });
+}
 
 const DEFAULT_LOCAL_URL = process.env.LOCAL_LLM_URL || 'http://localhost:11434';
 const DEFAULT_LOCAL_MODEL = process.env.LOCAL_LLM_MODEL || 'qwen2.5:7b';
@@ -270,6 +278,46 @@ app.get('/api/local-llm/status', async (req, res) => {
   }
 });
 
+// Check Gemini API configuration status or test a key
+app.get('/api/gemini/status', async (req, res) => {
+  const queryKey = req.query.apiKey as string | undefined;
+  const client = getGeminiClient(queryKey);
+  const hasKey = Boolean(client);
+
+  if (!hasKey) {
+    return res.json({
+      configured: false,
+      model: 'gemini-2.5-flash',
+      error: 'No Gemini API key detected. Provide a GEMINI_API_KEY or enter your key in settings.',
+    });
+  }
+
+  // Quick ping check
+  try {
+    const testResponse = await client!.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: 'Ping. Respond with single word "OK".',
+    });
+    if (testResponse?.text) {
+      return res.json({
+        configured: true,
+        model: 'gemini-2.5-flash',
+        status: 'online',
+        testResponse: testResponse.text.trim(),
+      });
+    }
+  } catch (err: any) {
+    return res.json({
+      configured: true,
+      status: 'error',
+      model: 'gemini-2.5-flash',
+      error: err?.message || 'Gemini API authentication failed.',
+    });
+  }
+
+  return res.json({ configured: true, status: 'ready', model: 'gemini-2.5-flash' });
+});
+
 // Primary psychological analysis route
 app.post('/api/analyze-logs', async (req, res) => {
   const {
@@ -281,6 +329,7 @@ app.post('/api/analyze-logs', async (req, res) => {
     engine = 'auto', // 'local' | 'cloud' | 'auto'
     localUrl = DEFAULT_LOCAL_URL,
     localModel = DEFAULT_LOCAL_MODEL,
+    geminiApiKey,
     targetDate,
     isRetrospective = false,
   } = req.body || {};
@@ -355,76 +404,99 @@ Analyze with CBT, polyvagal theory, and ultradian bio-rhythm principles. Return 
     console.warn(`[Local LLM] Local inference unavailable (${localResult.error}). Falling back to Cloud/Clinical...`);
   }
 
-  // 2. Cloud Gemini Fallback
-  const schema = {
-    type: Type.OBJECT,
-    properties: {
-      overallSummary: { type: Type.STRING },
-      mindsetState: { type: Type.STRING },
-      distortionInsights: {
-        type: Type.ARRAY,
-        items: {
-          type: Type.OBJECT,
-          properties: {
-            distortion: { type: Type.STRING },
-            triggerContext: { type: Type.STRING },
-            antidote: { type: Type.STRING },
-          },
-          required: ['distortion', 'triggerContext', 'antidote'],
-        },
-      },
-      energyRhythmAnalysis: { type: Type.STRING },
-      dailySuggestions: {
-        type: Type.ARRAY,
-        items: {
-          type: Type.OBJECT,
-          properties: {
-            category: { type: Type.STRING },
-            title: { type: Type.STRING },
-            actionableAdvice: { type: Type.STRING },
-            rationale: { type: Type.STRING },
-          },
-          required: ['category', 'title', 'actionableAdvice', 'rationale'],
-        },
-      },
-      groundingMantra: { type: Type.STRING },
-      recommendedBreathPattern: { type: Type.STRING },
-    },
-    required: [
-      'overallSummary',
-      'mindsetState',
-      'distortionInsights',
-      'energyRhythmAnalysis',
-      'dailySuggestions',
-      'groundingMantra',
-      'recommendedBreathPattern',
-    ],
-  };
+  // 2. Cloud Gemini
+  const geminiClient = getGeminiClient(geminiApiKey);
 
-  const modelsToTry = ['gemini-3.8-flash', 'gemini-3.1-flash-lite', 'gemini-flash-latest'];
-
-  for (const modelName of modelsToTry) {
-    try {
-      const response = await ai.models.generateContent({
-        model: modelName,
-        contents: userPrompt,
-        config: {
-          systemInstruction,
-          responseMimeType: 'application/json',
-          responseSchema: schema,
-        },
+  if (!geminiClient) {
+    if (engine === 'cloud') {
+      return res.status(400).json({
+        success: false,
+        error: 'Gemini API key is not configured.',
+        quickHelp: 'Please set GEMINI_API_KEY in your .env file or enter your Gemini API key in the AI Settings dialog.',
       });
+    }
+  } else {
+    const schema = {
+      type: Type.OBJECT,
+      properties: {
+        overallSummary: { type: Type.STRING },
+        mindsetState: { type: Type.STRING },
+        distortionInsights: {
+          type: Type.ARRAY,
+          items: {
+            type: Type.OBJECT,
+            properties: {
+              distortion: { type: Type.STRING },
+              triggerContext: { type: Type.STRING },
+              antidote: { type: Type.STRING },
+            },
+            required: ['distortion', 'triggerContext', 'antidote'],
+          },
+        },
+        energyRhythmAnalysis: { type: Type.STRING },
+        dailySuggestions: {
+          type: Type.ARRAY,
+          items: {
+            type: Type.OBJECT,
+            properties: {
+              category: { type: Type.STRING },
+              title: { type: Type.STRING },
+              actionableAdvice: { type: Type.STRING },
+              rationale: { type: Type.STRING },
+            },
+            required: ['category', 'title', 'actionableAdvice', 'rationale'],
+          },
+        },
+        groundingMantra: { type: Type.STRING },
+        recommendedBreathPattern: { type: Type.STRING },
+      },
+      required: [
+        'overallSummary',
+        'mindsetState',
+        'distortionInsights',
+        'energyRhythmAnalysis',
+        'dailySuggestions',
+        'groundingMantra',
+        'recommendedBreathPattern',
+      ],
+    };
 
-      if (response?.text) {
-        const parsed = JSON.parse(response.text.trim());
-        return res.json({ success: true, analysis: parsed, source: 'ai', modelUsed: modelName });
+    const modelsToTry = ['gemini-2.5-flash', 'gemini-1.5-flash', 'gemini-2.0-flash'];
+    let lastCloudError = '';
+
+    for (const modelName of modelsToTry) {
+      try {
+        const response = await geminiClient.models.generateContent({
+          model: modelName,
+          contents: userPrompt,
+          config: {
+            systemInstruction,
+            responseMimeType: 'application/json',
+            responseSchema: schema,
+          },
+        });
+
+        if (response?.text) {
+          const parsed = JSON.parse(response.text.trim());
+          return res.json({ success: true, analysis: parsed, source: 'ai', modelUsed: modelName });
+        }
+      } catch (err: any) {
+        lastCloudError = err?.message || String(err);
+        console.warn(`Cloud model ${modelName} encountered: ${lastCloudError}. Trying next fallback...`);
       }
-    } catch (err: any) {
-      console.warn(`Cloud model ${modelName} encountered: ${err?.message || err}. Trying next fallback...`);
+    }
+
+    // If user explicitly chose Gemini (cloud) and it failed, do not silently pretend it worked with local synthesis
+    if (engine === 'cloud') {
+      return res.status(502).json({
+        success: false,
+        error: `Gemini API call failed: ${lastCloudError}`,
+        quickHelp: 'Please check your Gemini API key validity and network connection, or switch to Local LLM mode.',
+      });
     }
   }
 
-  // 3. Fallback Clinical Synthesizer
+  // 3. Fallback Clinical Synthesizer (Only for auto mode or when both local and cloud are offline)
   const localAnalysis = generateLocalClinicalAnalysis({
     energyLogs,
     cbtEntries,

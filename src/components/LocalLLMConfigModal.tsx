@@ -25,6 +25,8 @@ interface LocalLLMConfigModalProps {
   setLocalModel: (model: string) => void;
   selectedEngine: 'local' | 'cloud' | 'auto';
   setSelectedEngine: (engine: 'local' | 'cloud' | 'auto') => void;
+  geminiApiKey: string;
+  setGeminiApiKey: (key: string) => void;
 }
 
 export default function LocalLLMConfigModal({
@@ -36,9 +38,13 @@ export default function LocalLLMConfigModal({
   setLocalModel,
   selectedEngine,
   setSelectedEngine,
+  geminiApiKey,
+  setGeminiApiKey,
 }: LocalLLMConfigModalProps) {
   const [testing, setTesting] = useState(false);
   const [statusResult, setStatusResult] = useState<any>(null);
+  const [testingGemini, setTestingGemini] = useState(false);
+  const [geminiStatus, setGeminiStatus] = useState<any>(null);
   const [copiedCmd, setCopiedCmd] = useState<string | null>(null);
 
   const testConnection = async () => {
@@ -57,9 +63,27 @@ export default function LocalLLMConfigModal({
     }
   };
 
+  const testGeminiConnection = async () => {
+    setTestingGemini(true);
+    try {
+      const res = await fetch(`/api/gemini/status?apiKey=${encodeURIComponent(geminiApiKey || '')}`);
+      const data = await res.json();
+      setGeminiStatus(data);
+    } catch (err: any) {
+      setGeminiStatus({
+        configured: false,
+        status: 'error',
+        error: err?.message || 'Could not test Gemini connection.',
+      });
+    } finally {
+      setTestingGemini(false);
+    }
+  };
+
   useEffect(() => {
     if (isOpen) {
       testConnection();
+      testGeminiConnection();
     }
   }, [isOpen, localUrl]);
 
@@ -159,7 +183,73 @@ export default function LocalLLMConfigModal({
             </div>
           </div>
 
-          {/* Connection Status Live Box */}
+          {/* Cloud Gemini Configuration Card */}
+          <div className={`p-4 rounded-2xl border space-y-3 transition-all ${
+            selectedEngine === 'cloud' ? 'bg-amber-50/50 border-amber-200 ring-1 ring-amber-200' : 'bg-sand-50/60 border-sand-200/90'
+          }`}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-semibold uppercase tracking-wider text-ink-700 flex items-center gap-1.5">
+                  <Sparkles size={14} className="text-amber-600" />
+                  Google Gemini (Cloud AI)
+                </span>
+                {geminiStatus?.configured && geminiStatus?.status === 'online' ? (
+                  <span className="flex items-center gap-1 text-[11px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-medium">
+                    <CheckCircle2 size={12} /> Active ({geminiStatus.model})
+                  </span>
+                ) : geminiStatus?.configured ? (
+                  <span className="flex items-center gap-1 text-[11px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-medium">
+                    <AlertCircle size={12} /> Key Error
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-1 text-[11px] bg-sand-200 text-ink-600 px-2 py-0.5 rounded-full font-medium">
+                    Key Not Set
+                  </span>
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={testGeminiConnection}
+                disabled={testingGemini}
+                className="text-xs text-ink-600 hover:text-ink-900 flex items-center gap-1 bg-white px-2.5 py-1 rounded-lg border border-sand-200 shadow-2xs"
+              >
+                <RefreshCw size={12} className={testingGemini ? 'animate-spin' : ''} />
+                <span>Verify Key</span>
+              </button>
+            </div>
+
+            <div>
+              <label className="text-[11px] font-medium text-ink-700 block mb-1">
+                Gemini API Key (saved in browser or via GEMINI_API_KEY env)
+              </label>
+              <div className="flex gap-2">
+                <input
+                  type="password"
+                  value={geminiApiKey}
+                  onChange={(e) => setGeminiApiKey(e.target.value)}
+                  placeholder="AIzaSy..."
+                  className="flex-1 text-xs bg-white border border-sand-300 rounded-xl px-3 py-2 text-ink-800 focus:outline-none focus:border-amber-400 font-mono"
+                />
+                <button
+                  type="button"
+                  onClick={testGeminiConnection}
+                  className="px-3 py-2 bg-white hover:bg-sand-100 text-ink-700 rounded-xl border border-sand-300 text-xs font-medium"
+                >
+                  Save & Check
+                </button>
+              </div>
+              <p className="text-[11px] text-ink-500 mt-1">
+                Supports models: <span className="font-mono text-ink-700">gemini-2.5-flash</span>, <span className="font-mono text-ink-700">gemini-1.5-flash</span>. Get your key free at <a href="https://aistudio.google.com/apikey" target="_blank" rel="noreferrer" className="text-amber-700 underline">aistudio.google.com</a>.
+              </p>
+              {geminiStatus?.error && (
+                <p className="text-[11px] text-rose-600 mt-1 bg-rose-50 p-2 rounded-lg border border-rose-200">
+                  ⚠️ {geminiStatus.error}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Connection Status Live Box (Local LLM) */}
           <div className="p-4 rounded-2xl bg-sand-50 border border-sand-200/90 space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">

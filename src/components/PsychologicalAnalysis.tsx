@@ -29,6 +29,7 @@ interface PsychologicalAnalysisProps {
 const LOCAL_STORAGE_ENGINE_KEY = 'mindflow_selected_engine';
 const LOCAL_STORAGE_URL_KEY = 'mindflow_local_llm_url';
 const LOCAL_STORAGE_MODEL_KEY = 'mindflow_local_llm_model';
+const LOCAL_STORAGE_GEMINI_KEY = 'mindflow_gemini_api_key';
 
 export default function PsychologicalAnalysis({ onStartBreathing, onRefreshTrigger, onOpenArchive }: PsychologicalAnalysisProps) {
   const [analysis, setAnalysis] = useState<PsychologicalAnalysisResult | null>(null);
@@ -37,15 +38,18 @@ export default function PsychologicalAnalysis({ onStartBreathing, onRefreshTrigg
   const [sourceMeta, setSourceMeta] = useState<{ source?: string; modelUsed?: string; latencyMs?: number } | null>(null);
   const [isConfigOpen, setIsConfigOpen] = useState(false);
 
-  // Engine preferences (defaults to cloud until user sets up local LLM)
+  // Engine preferences
   const [selectedEngine, setSelectedEngine] = useState<'local' | 'cloud' | 'auto'>(() => {
-    return (localStorage.getItem(LOCAL_STORAGE_ENGINE_KEY) as any) || 'cloud';
+    return (localStorage.getItem(LOCAL_STORAGE_ENGINE_KEY) as any) || 'local';
   });
   const [localUrl, setLocalUrl] = useState<string>(() => {
     return localStorage.getItem(LOCAL_STORAGE_URL_KEY) || 'http://localhost:11434';
   });
   const [localModel, setLocalModel] = useState<string>(() => {
     return localStorage.getItem(LOCAL_STORAGE_MODEL_KEY) || 'qwen2.5:7b';
+  });
+  const [geminiApiKey, setGeminiApiKey] = useState<string>(() => {
+    return localStorage.getItem(LOCAL_STORAGE_GEMINI_KEY) || '';
   });
 
   const [logStats, setLogStats] = useState({
@@ -61,7 +65,8 @@ export default function PsychologicalAnalysis({ onStartBreathing, onRefreshTrigg
     localStorage.setItem(LOCAL_STORAGE_ENGINE_KEY, selectedEngine);
     localStorage.setItem(LOCAL_STORAGE_URL_KEY, localUrl);
     localStorage.setItem(LOCAL_STORAGE_MODEL_KEY, localModel);
-  }, [selectedEngine, localUrl, localModel]);
+    localStorage.setItem(LOCAL_STORAGE_GEMINI_KEY, geminiApiKey);
+  }, [selectedEngine, localUrl, localModel, geminiApiKey]);
 
   const loadCurrentStats = () => {
     const energy = StorageService.getEnergyLogs();
@@ -112,6 +117,7 @@ export default function PsychologicalAnalysis({ onStartBreathing, onRefreshTrigg
           engine: selectedEngine,
           localUrl,
           localModel,
+          geminiApiKey,
         }),
       });
 
@@ -170,33 +176,62 @@ export default function PsychologicalAnalysis({ onStartBreathing, onRefreshTrigg
               <h2 className="text-xl md:text-2xl font-light tracking-tight text-ink-900">
                 Daily Psychological Analysis & Suggestions
               </h2>
-              {/* Active Engine Badge */}
-              <button
-                onClick={() => setIsConfigOpen(true)}
-                className="inline-flex items-center gap-1.5 text-[11px] font-medium bg-sand-100 hover:bg-sand-200 text-ink-800 px-2.5 py-0.5 rounded-full border border-sand-200 transition-colors shadow-2xs"
-                title="Configure Local LLM"
-              >
-                {selectedEngine === 'local' ? (
-                  <>
-                    <Laptop size={12} className="text-sage-600" />
-                    <span>Local ({localModel})</span>
-                  </>
-                ) : selectedEngine === 'auto' ? (
-                  <>
-                    <Zap size={12} className="text-lavender-600" />
-                    <span>Auto ({localModel})</span>
-                  </>
-                ) : (
-                  <>
-                    <Sparkles size={12} className="text-sand-600" />
-                    <span>Cloud (Gemini)</span>
-                  </>
-                )}
-                <Settings2 size={11} className="text-ink-400" />
-              </button>
+              {/* Interactive Engine Switcher Pill */}
+              <div className="inline-flex items-center p-0.5 rounded-full bg-sand-100 border border-sand-200 shadow-2xs">
+                <button
+                  type="button"
+                  onClick={() => setSelectedEngine('local')}
+                  className={`inline-flex items-center gap-1 text-[11px] font-medium px-2.5 py-1 rounded-full transition-all ${
+                    selectedEngine === 'local'
+                      ? 'bg-white text-sage-900 shadow-xs border border-sage-300 font-semibold'
+                      : 'text-ink-600 hover:text-ink-900'
+                  }`}
+                  title="Run offline on Apple Silicon M4 Pro using Ollama"
+                >
+                  <Laptop size={12} className={selectedEngine === 'local' ? 'text-sage-600' : 'text-ink-400'} />
+                  <span>Local LLM</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setSelectedEngine('cloud')}
+                  className={`inline-flex items-center gap-1 text-[11px] font-medium px-2.5 py-1 rounded-full transition-all ${
+                    selectedEngine === 'cloud'
+                      ? 'bg-white text-amber-900 shadow-xs border border-amber-300 font-semibold'
+                      : 'text-ink-600 hover:text-ink-900'
+                  }`}
+                  title="Run in Google Cloud using Gemini 2.5 Flash"
+                >
+                  <Sparkles size={12} className={selectedEngine === 'cloud' ? 'text-amber-500' : 'text-ink-400'} />
+                  <span>Gemini</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setSelectedEngine('auto')}
+                  className={`inline-flex items-center gap-1 text-[11px] font-medium px-2 py-1 rounded-full transition-all ${
+                    selectedEngine === 'auto'
+                      ? 'bg-white text-lavender-900 shadow-xs border border-lavender-300 font-semibold'
+                      : 'text-ink-600 hover:text-ink-900'
+                  }`}
+                  title="Auto mode: Try Local first, seamlessly fallback to Gemini"
+                >
+                  <Zap size={12} className={selectedEngine === 'auto' ? 'text-lavender-600' : 'text-ink-400'} />
+                  <span>Auto</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setIsConfigOpen(true)}
+                  className="p-1 text-ink-400 hover:text-ink-800 rounded-full hover:bg-sand-200 transition-colors ml-0.5 mr-0.5"
+                  title="Configure LLM & Gemini settings"
+                >
+                  <Settings2 size={12} />
+                </button>
+              </div>
             </div>
             <p className="text-xs md:text-sm text-ink-600 font-light mt-0.5">
-              Synthesizes daily energy logs, CBT reframes, and focus blocks using your chosen engine.
+              Synthesizes daily energy logs, CBT reframes, and focus blocks using {selectedEngine === 'local' ? `Local Ollama (${localModel})` : selectedEngine === 'cloud' ? 'Google Gemini (Cloud)' : 'Auto Local-to-Cloud'}.
             </p>
           </div>
         </div>
@@ -504,7 +539,7 @@ export default function PsychologicalAnalysis({ onStartBreathing, onRefreshTrigg
         </div>
       )}
 
-      {/* Local LLM Configuration Modal */}
+      {/* Local LLM & Gemini Configuration Modal */}
       <LocalLLMConfigModal
         isOpen={isConfigOpen}
         onClose={() => setIsConfigOpen(false)}
@@ -514,6 +549,8 @@ export default function PsychologicalAnalysis({ onStartBreathing, onRefreshTrigg
         setLocalModel={setLocalModel}
         selectedEngine={selectedEngine}
         setSelectedEngine={setSelectedEngine}
+        geminiApiKey={geminiApiKey}
+        setGeminiApiKey={setGeminiApiKey}
       />
     </div>
   );

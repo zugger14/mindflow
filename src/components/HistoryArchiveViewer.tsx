@@ -75,9 +75,10 @@ export default function HistoryArchiveViewer({
           focusSessions: snapshot.focusSessions,
           targetDate: selectedDate,
           isRetrospective: true,
-          engine: localStorage.getItem('mindflow_selected_engine') || 'cloud',
+          engine: localStorage.getItem('mindflow_selected_engine') || 'local',
           localUrl: localStorage.getItem('mindflow_local_llm_url') || undefined,
           localModel: localStorage.getItem('mindflow_local_llm_model') || undefined,
+          geminiApiKey: localStorage.getItem('mindflow_gemini_api_key') || undefined,
         }),
       });
 
