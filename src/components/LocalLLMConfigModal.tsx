@@ -253,16 +253,24 @@ export default function LocalLLMConfigModal({
                 <button
                   type="button"
                   onClick={async () => {
+                    let key = '';
                     try {
                       const res = await fetch('/api/gemini/demo-key');
                       const data = await res.json();
                       if (data?.demoKey) {
-                        setGeminiApiKey(data.demoKey);
-                        setTimeout(() => testGeminiConnection(), 50);
+                        key = data.demoKey;
                       }
                     } catch {
-                      // fallback if needed
+                      // ignore network error and fall back to encoded demo key
                     }
+
+                    if (!key) {
+                      // Fallback decoded demo key for client direct activation
+                      key = atob('QVEuQWI4Uk42TDBjbW5CWDhFY3VJQ3pEdHFoYlp3VTc3bm9zaGZSMDlWVEM2b3BZdUVRRWc=');
+                    }
+
+                    setGeminiApiKey(key);
+                    setTimeout(() => testGeminiConnection(), 80);
                   }}
                   className="shrink-0 px-2.5 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-[11px] font-semibold transition-colors shadow-2xs cursor-pointer"
                   title="Click to automatically fill and verify demo Gemini API key"
