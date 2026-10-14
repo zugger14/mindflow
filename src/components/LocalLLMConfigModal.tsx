@@ -227,22 +227,69 @@ export default function LocalLLMConfigModal({
                   type="password"
                   value={geminiApiKey}
                   onChange={(e) => setGeminiApiKey(e.target.value)}
-                  placeholder="AIzaSy..."
+                  placeholder="AIzaSy... or AQ.Ab8RN6..."
                   className="flex-1 text-xs bg-white border border-sand-300 rounded-xl px-3 py-2 text-ink-800 focus:outline-none focus:border-amber-400 font-mono"
                 />
                 <button
                   type="button"
                   onClick={testGeminiConnection}
-                  className="px-3 py-2 bg-white hover:bg-sand-100 text-ink-700 rounded-xl border border-sand-300 text-xs font-medium"
+                  className="px-3 py-2 bg-white hover:bg-sand-100 text-ink-700 rounded-xl border border-sand-300 text-xs font-medium cursor-pointer"
                 >
                   Save & Check
                 </button>
               </div>
-              <p className="text-[11px] text-ink-500 mt-1">
-                Supports models: <span className="font-mono text-ink-700">gemini-2.5-flash</span>, <span className="font-mono text-ink-700">gemini-1.5-flash</span>. Get your key free at <a href="https://aistudio.google.com/apikey" target="_blank" rel="noreferrer" className="text-amber-700 underline">aistudio.google.com</a>.
-              </p>
+
+              {/* Demo Key Quick Insert Banner */}
+              <div className="mt-2.5 p-2.5 bg-amber-50/80 rounded-xl border border-amber-200/90 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs">
+                <div className="space-y-0.5">
+                  <div className="flex items-center gap-1.5 font-medium text-amber-900 text-[11px]">
+                    <Sparkles size={12} className="text-amber-600 shrink-0" />
+                    <span>Demo Key for Instant Testing:</span>
+                  </div>
+                  <p className="text-[10px] text-ink-600 font-mono">
+                    Official Pre-configured Gemini Demo Key (Ready for 1-click activation)
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    try {
+                      const res = await fetch('/api/gemini/demo-key');
+                      const data = await res.json();
+                      if (data?.demoKey) {
+                        setGeminiApiKey(data.demoKey);
+                        setTimeout(() => testGeminiConnection(), 50);
+                      }
+                    } catch {
+                      // fallback if needed
+                    }
+                  }}
+                  className="shrink-0 px-2.5 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-[11px] font-semibold transition-colors shadow-2xs cursor-pointer"
+                  title="Click to automatically fill and verify demo Gemini API key"
+                >
+                  Use Demo Key
+                </button>
+              </div>
+
+              {/* Free Quota Guidance Box */}
+              <div className="mt-2 text-[11px] text-ink-600 space-y-1 bg-white p-2.5 rounded-xl border border-sand-200">
+                <p className="leading-relaxed">
+                  💡 <strong>Need your own key?</strong> Google provides a <strong>100% Free Tier</strong> for developers and users. The free tier gives you full access to Gemini Flash models with rate limits and quota that <strong>automatically reset every day</strong>.
+                </p>
+                <div className="pt-1">
+                  <a
+                    href="https://aistudio.google.com/apikey"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1 text-amber-700 hover:text-amber-900 font-semibold underline text-xs"
+                  >
+                    <span>Get Your Free Gemini API Key at Google AI Studio &rarr;</span>
+                  </a>
+                </div>
+              </div>
+
               {geminiStatus?.error && (
-                <p className="text-[11px] text-rose-600 mt-1 bg-rose-50 p-2 rounded-lg border border-rose-200">
+                <p className="text-[11px] text-rose-600 mt-1.5 bg-rose-50 p-2 rounded-lg border border-rose-200">
                   ⚠️ {geminiStatus.error}
                 </p>
               )}

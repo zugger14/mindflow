@@ -287,35 +287,49 @@ app.get('/api/gemini/status', async (req, res) => {
   if (!hasKey) {
     return res.json({
       configured: false,
-      model: 'gemini-2.5-flash',
+      model: 'gemini-3.5-flash-lite',
       error: 'No Gemini API key detected. Provide a GEMINI_API_KEY or enter your key in settings.',
     });
   }
 
-  // Quick ping check
-  try {
-    const testResponse = await client!.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: 'Ping. Respond with single word "OK".',
-    });
-    if (testResponse?.text) {
-      return res.json({
-        configured: true,
-        model: 'gemini-2.5-flash',
-        status: 'online',
-        testResponse: testResponse.text.trim(),
+  // Quick ping check across available active models
+  const pingModels = ['gemini-3.5-flash-lite', 'gemini-3.8-flash', 'gemini-flash-latest'];
+  let lastPingError = '';
+
+  for (const pModel of pingModels) {
+    try {
+      const testResponse = await client!.models.generateContent({
+        model: pModel,
+        contents: 'Ping. Respond with single word "OK".',
       });
+      if (testResponse?.text) {
+        return res.json({
+          configured: true,
+          model: pModel,
+          status: 'online',
+          testResponse: testResponse.text.trim(),
+        });
+      }
+    } catch (err: any) {
+      lastPingError = err?.message || String(err);
     }
-  } catch (err: any) {
-    return res.json({
-      configured: true,
-      status: 'error',
-      model: 'gemini-2.5-flash',
-      error: err?.message || 'Gemini API authentication failed.',
-    });
   }
 
-  return res.json({ configured: true, status: 'ready', model: 'gemini-2.5-flash' });
+  return res.json({
+    configured: true,
+    status: 'error',
+    model: 'gemini-3.5-flash-lite',
+    error: lastPingError || 'Gemini API authentication failed.',
+  });
+});
+
+// Provide server-configured demo key to client if requested
+app.get('/api/gemini/demo-key', (_req, res) => {
+  const hasEnvKey = Boolean(process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY.length > 5);
+  return res.json({
+    available: hasEnvKey,
+    demoKey: hasEnvKey ? process.env.GEMINI_API_KEY : '',
+  });
 });
 
 // Primary psychological analysis route
@@ -461,7 +475,12 @@ Analyze with CBT, polyvagal theory, and ultradian bio-rhythm principles. Return 
       ],
     };
 
-    const modelsToTry = ['gemini-2.5-flash', 'gemini-1.5-flash', 'gemini-2.0-flash'];
+    const modelsToTry = [
+      'gemini-3.5-flash-lite',
+      'gemini-3.8-flash',
+      'gemini-flash-latest',
+      'gemini-2.5-flash',
+    ];
     let lastCloudError = '';
 
     for (const modelName of modelsToTry) {
