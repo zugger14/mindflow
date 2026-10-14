@@ -94,8 +94,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         } catch (e) {
           console.warn('Could not sync cloud data on login:', e);
         }
+        setUserVersion((v) => v + 1);
       } else {
+        StorageService.setActiveUserId('default');
         setIsCloudSynced(false);
+        setUserVersion((v) => v + 1);
       }
       setLoading(false);
     });
@@ -107,6 +110,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const res = await signInWithPopup(auth, googleProvider);
       if (res.user) {
+        StorageService.setActiveUserId(res.user.uid);
+        setUserVersion((v) => v + 1);
         await syncLocalToCloudWithUser(res.user);
       }
     } catch (err: any) {
@@ -120,7 +125,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = async () => {
     await signOut(auth);
+    StorageService.setActiveUserId('default');
     setIsCloudSynced(false);
+    setUserVersion((v) => v + 1);
   };
 
   const syncLocalToCloudWithUser = async (u: User) => {
