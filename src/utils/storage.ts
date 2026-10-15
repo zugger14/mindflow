@@ -504,16 +504,52 @@ export const DEFAULT_FOCUS_ACHIEVEMENTS: FocusAchievement[] = [
   },
 ];
 
+export function clearUnauthenticatedData(): void {
+  if (typeof localStorage !== 'undefined') {
+    try {
+      Object.values(STORAGE_KEYS).forEach((k) => {
+        localStorage.removeItem(k);
+      });
+    } catch {
+      // ignore
+    }
+  }
+  // Clear default keys in memoryStore as well
+  Object.values(STORAGE_KEYS).forEach((k) => {
+    memoryStore.delete(k);
+  });
+}
+
+// Automatically purge unauthenticated lingering data on initial script load
+if (typeof localStorage !== 'undefined') {
+  try {
+    const active = localStorage.getItem(STORAGE_KEYS.ACTIVE_QA_USER);
+    if (!active || active === 'default') {
+      Object.values(STORAGE_KEYS).forEach((k) => {
+        localStorage.removeItem(k);
+      });
+    }
+  } catch {
+    // ignore
+  }
+}
+
 export function getStoredData<T>(key: string, fallback: T): T {
   const resolved = resolveKey(key);
-  try {
-    if (typeof localStorage !== 'undefined') {
-      const raw = localStorage.getItem(resolved);
-      if (raw) return JSON.parse(raw);
+  const uid = getActiveUserId();
+  
+  // If user is not signed in (uid is 'default'), do NOT load from persistent localStorage
+  if (uid && uid !== 'default') {
+    try {
+      if (typeof localStorage !== 'undefined') {
+        const raw = localStorage.getItem(resolved);
+        if (raw) return JSON.parse(raw);
+      }
+    } catch (e) {
+      // fallback
     }
-  } catch (e) {
-    // fallback
   }
+
   const mem = memoryStore.get(resolved);
   if (mem) {
     try {
@@ -527,14 +563,21 @@ export function getStoredData<T>(key: string, fallback: T): T {
 
 export function setStoredData<T>(key: string, data: T): void {
   const resolved = resolveKey(key);
+  const uid = getActiveUserId();
   const serialized = JSON.stringify(data);
+  
+  // In-memory update for current session
   memoryStore.set(resolved, serialized);
-  try {
-    if (typeof localStorage !== 'undefined') {
-      localStorage.setItem(resolved, serialized);
+
+  // ONLY persist to browser localStorage when signed in with Google (uid !== 'default')
+  if (uid && uid !== 'default') {
+    try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem(resolved, serialized);
+      }
+    } catch (e) {
+      // ignore
     }
-  } catch (e) {
-    // ignore
   }
 }
 

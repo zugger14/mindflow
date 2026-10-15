@@ -8,7 +8,7 @@ import {
   User 
 } from '../firebase';
 import { FirestoreService } from '../services/firestoreService';
-import { StorageService, QA_PROFILES } from '../utils/storage';
+import { StorageService, QA_PROFILES, clearUnauthenticatedData } from '../utils/storage';
 import { QAUserProfile } from '../types/logs';
 
 interface AuthContextType {
@@ -126,6 +126,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = async () => {
     await signOut(auth);
     StorageService.setActiveUserId('default');
+    clearUnauthenticatedData();
     setIsCloudSynced(false);
     setUserVersion((v) => v + 1);
   };
