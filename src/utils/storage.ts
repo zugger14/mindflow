@@ -509,6 +509,7 @@ export function clearUnauthenticatedData(): void {
     try {
       Object.values(STORAGE_KEYS).forEach((k) => {
         localStorage.removeItem(k);
+        localStorage.removeItem(`mindflow_${k}_default`);
       });
     } catch {
       // ignore
@@ -517,37 +518,40 @@ export function clearUnauthenticatedData(): void {
   // Clear default keys in memoryStore as well
   Object.values(STORAGE_KEYS).forEach((k) => {
     memoryStore.delete(k);
+    memoryStore.delete(`mindflow_${k}_default`);
   });
 }
 
-// Automatically purge unauthenticated lingering data on initial script load
-if (typeof localStorage !== 'undefined') {
-  try {
-    const active = localStorage.getItem(STORAGE_KEYS.ACTIVE_QA_USER);
-    if (!active || active === 'default') {
-      Object.values(STORAGE_KEYS).forEach((k) => {
-        localStorage.removeItem(k);
-      });
+export function resetAllLocalData(): void {
+  if (typeof localStorage !== 'undefined') {
+    try {
+      const keysToRemove: string[] = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && (key.startsWith('mindflow') || key.includes('mindflow'))) {
+          keysToRemove.push(key);
+        }
+      }
+      keysToRemove.forEach((k) => localStorage.removeItem(k));
+      sessionStorage.clear();
+    } catch {
+      // ignore
     }
-  } catch {
-    // ignore
   }
+  memoryStore.clear();
+  currentActiveUserId = 'default';
 }
 
 export function getStoredData<T>(key: string, fallback: T): T {
   const resolved = resolveKey(key);
-  const uid = getActiveUserId();
   
-  // If user is not signed in (uid is 'default'), do NOT load from persistent localStorage
-  if (uid && uid !== 'default') {
-    try {
-      if (typeof localStorage !== 'undefined') {
-        const raw = localStorage.getItem(resolved);
-        if (raw) return JSON.parse(raw);
-      }
-    } catch (e) {
-      // fallback
+  try {
+    if (typeof localStorage !== 'undefined') {
+      const raw = localStorage.getItem(resolved);
+      if (raw) return JSON.parse(raw);
     }
+  } catch (e) {
+    // fallback
   }
 
   const mem = memoryStore.get(resolved);
@@ -563,21 +567,18 @@ export function getStoredData<T>(key: string, fallback: T): T {
 
 export function setStoredData<T>(key: string, data: T): void {
   const resolved = resolveKey(key);
-  const uid = getActiveUserId();
   const serialized = JSON.stringify(data);
   
   // In-memory update for current session
   memoryStore.set(resolved, serialized);
 
-  // ONLY persist to browser localStorage when signed in with Google (uid !== 'default')
-  if (uid && uid !== 'default') {
-    try {
-      if (typeof localStorage !== 'undefined') {
-        localStorage.setItem(resolved, serialized);
-      }
-    } catch (e) {
-      // ignore
+  // Persist to browser localStorage
+  try {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem(resolved, serialized);
     }
+  } catch (e) {
+    // ignore
   }
 }
 
@@ -930,6 +931,8 @@ export const StorageService = {
     setStoredData(STORAGE_KEYS.FOCUS_SESSIONS, DEFAULT_FOCUS_SESSIONS);
     setStoredData(STORAGE_KEYS.FOCUS_ACHIEVEMENTS, DEFAULT_FOCUS_ACHIEVEMENTS);
   },
+
+  resetAllLocalData: () => resetAllLocalData(),
 
   getActiveUserId: () => getActiveUserId(),
 

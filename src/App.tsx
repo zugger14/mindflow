@@ -15,7 +15,8 @@ import {
   TrendingUp,
   Volume2,
   Sun,
-  Moon
+  Moon,
+  Trash2
 } from 'lucide-react';
 import UltradianTimer from './components/UltradianTimer';
 import TaskManager from './components/TaskManager';
@@ -32,6 +33,7 @@ import UserAuthPill from './components/UserAuthPill';
 import HistoryArchiveViewer from './components/HistoryArchiveViewer';
 import CircadianGuideBanner, { AppIntentMode } from './components/CircadianGuideBanner';
 import SyncPromptModal from './components/SyncPromptModal';
+import ResetDataModal from './components/ResetDataModal';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
 function DashboardContent() {
@@ -45,6 +47,7 @@ function DashboardContent() {
   const [archiveDate, setArchiveDate] = useState<string | undefined>(undefined);
   const [syncModalOpen, setSyncModalOpen] = useState(false);
   const [syncModalAction, setSyncModalAction] = useState('entry');
+  const [resetModalOpen, setResetModalOpen] = useState(false);
 
   // Dark mode state
   const [isDark, setIsDark] = useState<boolean>(() => {
@@ -772,6 +775,24 @@ function DashboardContent() {
         </AnimatePresence>
       </div>
 
+      {/* Footer with Storage Info & Reset */}
+      <footer className="max-w-7xl mx-auto mt-12 pt-6 pb-8 border-t border-sand-200/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-ink-500">
+        <div className="flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse" />
+          <span>MindFlow Cognitive OS • Local Storage Active</span>
+        </div>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => setResetModalOpen(true)}
+            className="text-ink-500 hover:text-rose-600 transition-colors flex items-center gap-1.5 cursor-pointer font-medium"
+            title="Purge all local storage and reset dashboard"
+          >
+            <Trash2 size={13} />
+            <span>Reset Local Storage</span>
+          </button>
+        </div>
+      </footer>
+
       {/* Historical Log Archive & Retrospective Modal */}
       <HistoryArchiveViewer
         isOpen={isArchiveOpen}
@@ -787,6 +808,12 @@ function DashboardContent() {
         isOpen={syncModalOpen}
         onClose={() => setSyncModalOpen(false)}
         actionName={syncModalAction}
+      />
+
+      {/* Delete Local Storage & Reset Modal */}
+      <ResetDataModal
+        isOpen={resetModalOpen}
+        onClose={() => setResetModalOpen(false)}
       />
     </div>
   );
