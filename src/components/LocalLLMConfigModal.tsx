@@ -110,11 +110,16 @@ export default function LocalLLMConfigModal({
               <Laptop size={22} />
             </div>
             <div>
-              <h3 className="text-xl font-light tracking-tight text-ink-900">
-                Local LLM Setup (MacBook M4 Pro)
-              </h3>
+              <div className="flex items-center gap-2">
+                <h3 className="text-xl font-light tracking-tight text-ink-900">
+                  Local LLM Setup
+                </h3>
+                <span className="text-[10px] bg-sage-100 text-sage-800 font-medium px-2 py-0.5 rounded-full border border-sage-200">
+                  Tested on M4 Pro Mac locally
+                </span>
+              </div>
               <p className="text-xs text-ink-500 font-light mt-0.5">
-                Private, zero-telemetry psychological insights running natively on your Apple Silicon hardware.
+                Private, zero-telemetry psychological insights running natively on your local hardware. Tested on M4 Pro Mac locally.
               </p>
             </div>
           </div>
@@ -378,12 +383,12 @@ export default function LocalLLMConfigModal({
             )}
           </div>
 
-          {/* M4 Pro Hardware Sizing & Concurrent Users Guide */}
+          {/* Hardware Sizing & Concurrent Users Guide */}
           <div className="bg-sage-50/70 rounded-2xl p-4.5 border border-sage-200/90 space-y-3">
             <div className="flex items-center gap-2">
               <Cpu size={18} className="text-sage-700" />
               <h4 className="text-sm font-semibold text-ink-900">
-                Hardware Sizing: MacBook M4 Pro (24 GB VRAM)
+                Hardware Sizing (Tested on M4 Pro Mac locally &bull; 24 GB Unified Memory)
               </h4>
             </div>
 

@@ -254,7 +254,7 @@ export default function PsychologicalAnalysis({ onStartBreathing, onRefreshTrigg
             title="Local LLM Settings & Hardware Guide"
           >
             <Laptop size={14} className="text-sage-600" />
-            <span className="hidden md:inline">M4 Pro Setup</span>
+            <span className="hidden md:inline">Local LLM Setup</span>
           </button>
 
           <button
