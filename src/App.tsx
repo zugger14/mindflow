@@ -31,10 +31,11 @@ import AmbientSoundscapes from './components/AmbientSoundscapes';
 import UserAuthPill from './components/UserAuthPill';
 import HistoryArchiveViewer from './components/HistoryArchiveViewer';
 import CircadianGuideBanner, { AppIntentMode } from './components/CircadianGuideBanner';
+import SyncPromptModal from './components/SyncPromptModal';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
 function DashboardContent() {
-  const { userVersion } = useAuth();
+  const { user, userVersion } = useAuth();
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [breathingActive, setBreathingActive] = useState(false);
   const [activeMode, setActiveMode] = useState<AppIntentMode>('focus');
@@ -42,6 +43,8 @@ function DashboardContent() {
   const [isBreakMode, setIsBreakMode] = useState(false);
   const [isArchiveOpen, setIsArchiveOpen] = useState(false);
   const [archiveDate, setArchiveDate] = useState<string | undefined>(undefined);
+  const [syncModalOpen, setSyncModalOpen] = useState(false);
+  const [syncModalAction, setSyncModalAction] = useState('entry');
 
   // Dark mode state
   const [isDark, setIsDark] = useState<boolean>(() => {
@@ -81,6 +84,19 @@ function DashboardContent() {
 
   const triggerStatsRefresh = () => {
     setRefreshTrigger((prev) => prev + 1);
+  };
+
+  const handleDataInput = (action: string) => {
+    triggerStatsRefresh();
+    if (!user) {
+      // Check if user has already seen prompt in this session
+      const prompted = sessionStorage.getItem('mindflow_sync_prompted');
+      if (!prompted) {
+        sessionStorage.setItem('mindflow_sync_prompted', 'true');
+        setSyncModalAction(action);
+        setSyncModalOpen(true);
+      }
+    }
   };
 
   const handleStartBreathing = () => {
@@ -343,7 +359,7 @@ function DashboardContent() {
 
                 <div className="lg:col-span-7 min-h-[440px]">
                   <TaskManager
-                    onTaskUpdated={triggerStatsRefresh}
+                    onTaskUpdated={() => handleDataInput('task')}
                     onOpenHistory={() => {
                       setArchiveDate(undefined);
                       setIsArchiveOpen(true);
@@ -421,12 +437,12 @@ function DashboardContent() {
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
                 {/* 1. Brain Dump */}
                 <div className="min-h-[460px]">
-                  <BrainDump onThoughtUpdated={triggerStatsRefresh} />
+                  <BrainDump onThoughtUpdated={() => handleDataInput('brain dump thought')} />
                 </div>
 
                 {/* 2. CBT Thought Journal */}
                 <div className="min-h-[460px]">
-                  <CBTJournal onEntrySaved={triggerStatsRefresh} />
+                  <CBTJournal onEntrySaved={() => handleDataInput('CBT thought reframe')} />
                 </div>
 
                 {/* 3. Box Breathing */}
@@ -488,7 +504,7 @@ function DashboardContent() {
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
                 <div className="lg:col-span-8">
                   <EnergyTracker
-                    onLogSaved={triggerStatsRefresh}
+                    onLogSaved={() => handleDataInput('energy check-in')}
                     onOpenArchive={() => {
                       setArchiveDate(undefined);
                       setIsArchiveOpen(true);
@@ -769,6 +785,13 @@ function DashboardContent() {
           setIsArchiveOpen(false);
           setArchiveDate(undefined);
         }}
+      />
+
+      {/* Sync Prompt Dialogue for Guest Users */}
+      <SyncPromptModal
+        isOpen={syncModalOpen}
+        onClose={() => setSyncModalOpen(false)}
+        actionName={syncModalAction}
       />
     </div>
   );

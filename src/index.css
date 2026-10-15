@@ -499,3 +499,67 @@ html.dark span.text-amber-700 {
   color: #fbbf24 !important;
 }
 
+/* Pillar III Container & Subcategory Enhancements in Dark Mode */
+html.dark .bg-sand-200\/80 {
+  background-color: #21262d !important;
+}
+
+/* 30-Day Heatmap Cells in Dark Mode */
+html.dark .bg-sand-50\/70 button.bg-white {
+  background-color: #161b22 !important;
+  border-color: #30363d !important;
+  color: #8b949e !important;
+}
+
+html.dark .bg-sand-50\/70 button.bg-white:hover {
+  border-color: #484f58 !important;
+  background-color: #21262d !important;
+}
+
+html.dark .bg-sand-50\/70 button.bg-emerald-100 {
+  background-color: rgba(16, 185, 129, 0.25) !important;
+  border-color: rgba(16, 185, 129, 0.4) !important;
+  color: #6ee7b7 !important;
+}
+
+html.dark .bg-sand-50\/70 button.bg-sand-200\/80 {
+  background-color: #21262d !important;
+  border-color: #30363d !important;
+  color: #8b949e !important;
+}
+
+/* Metric Cards in Consistency Tracker */
+html.dark .rounded-3xl.bg-sand-50\/80 {
+  background-color: #161b22 !important;
+  border-color: #30363d !important;
+}
+
+html.dark .rounded-3xl.bg-sand-50\/80 .text-ink-800 {
+  color: #f0f6fc !important;
+}
+
+/* Filter pills (Mood & Energy, CBT Reframes, Focus Sessions, Tasks Completed) */
+html.dark .bg-sand-100.text-ink-600 {
+  background-color: #21262d !important;
+  color: #c9d1d9 !important;
+  border: 1px solid #30363d !important;
+}
+
+html.dark .bg-sand-100.text-ink-600:hover {
+  background-color: #30363d !important;
+  color: #f0f6fc !important;
+}
+
+/* Category grid text inside Day Breakdown & Habit cards */
+html.dark .text-amber-900 {
+  color: #fcd34d !important;
+}
+
+html.dark .text-indigo-900 {
+  color: #c7d2fe !important;
+}
+
+html.dark .text-teal-900 {
+  color: #5eead4 !important;
+}
+
