@@ -567,3 +567,40 @@ html.dark .text-teal-900 {
   color: #5eead4 !important;
 }
 
+/* Somatic & Mood Tracker Sliders & Sub-cards in Dark Mode */
+html.dark .text-emerald-950 {
+  color: #34d399 !important;
+  font-weight: 600 !important;
+}
+
+html.dark .text-purple-950 {
+  color: #c084fc !important;
+  font-weight: 600 !important;
+}
+
+/* EnergyTracker slider container cards */
+html.dark [class*="from-emerald-50\/50"][class*="to-teal-50\/30"] {
+  background-image: none !important;
+  background-color: #161d27 !important;
+  border-color: rgba(16, 185, 129, 0.35) !important;
+}
+
+html.dark [class*="from-purple-50\/50"][class*="to-indigo-50\/30"] {
+  background-image: none !important;
+  background-color: #1a162b !important;
+  border-color: rgba(168, 85, 247, 0.35) !important;
+}
+
+/* Slider min/max/neutral endpoint label text */
+html.dark [class*="from-emerald-50\/50"] .text-ink-500,
+html.dark [class*="from-purple-50\/50"] .text-ink-500 {
+  color: #94a3b8 !important;
+  font-weight: 500 !important;
+}
+
+/* Slider range bar track contrast */
+html.dark input[type="range"].bg-sand-200 {
+  background-color: #334155 !important;
+}
+
+

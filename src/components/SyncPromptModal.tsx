@@ -50,10 +50,10 @@ export default function SyncPromptModal({ isOpen, onClose, actionName = 'entry' 
             </div>
             <div>
               <h3 className="text-base font-semibold text-ink-900 tracking-tight">
-                Save & Sync Across Devices
+                Sign In to Save & Sync Data
               </h3>
               <p className="text-xs text-ink-500 font-light">
-                Your {actionName} was saved to this browser session.
+                Sign in with Google to save your {actionName} permanently.
               </p>
             </div>
           </div>
@@ -62,11 +62,11 @@ export default function SyncPromptModal({ isOpen, onClose, actionName = 'entry' 
             <div className="flex items-start gap-2.5">
               <ShieldCheck size={16} className="text-emerald-600 shrink-0 mt-0.5" />
               <p className="leading-relaxed">
-                Sign in with Google to backup your habits, focus logs, and psychological reframes to your secure private Firestore cloud.
+                To prevent unauthenticated data loss, sign in with your Google account. Your daily energy check-ins, tasks, and reframes will automatically backup to your private Firestore database.
               </p>
             </div>
             <p className="text-[11px] text-ink-500 font-light border-t border-sand-200/80 pt-2.5">
-              Without signing in, data remains local to this browser tab and will reset when you clear browsing cache.
+              If you skip signing in, data will not be persisted across browser refreshes or devices.
             </p>
           </div>
 
@@ -98,9 +98,9 @@ export default function SyncPromptModal({ isOpen, onClose, actionName = 'entry' 
 
             <button
               onClick={onClose}
-              className="w-full sm:w-auto px-4 py-2.5 rounded-xl text-ink-600 hover:text-ink-900 bg-sand-100 hover:bg-sand-200 text-xs font-medium transition-colors"
+              className="w-full sm:w-auto px-4 py-2.5 rounded-xl text-ink-600 hover:text-ink-900 bg-sand-100 hover:bg-sand-200 text-xs font-medium transition-colors cursor-pointer"
             >
-              Maybe Later
+              Back to Dashboard
             </button>
           </div>
         </motion.div>

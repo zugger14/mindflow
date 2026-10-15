@@ -89,13 +89,8 @@ function DashboardContent() {
   const handleDataInput = (action: string) => {
     triggerStatsRefresh();
     if (!user) {
-      // Check if user has already seen prompt in this session
-      const prompted = sessionStorage.getItem('mindflow_sync_prompted');
-      if (!prompted) {
-        sessionStorage.setItem('mindflow_sync_prompted', 'true');
-        setSyncModalAction(action);
-        setSyncModalOpen(true);
-      }
+      setSyncModalAction(action);
+      setSyncModalOpen(true);
     }
   };
 
