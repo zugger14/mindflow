@@ -424,3 +424,78 @@ html.dark ::-webkit-scrollbar-thumb:hover {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
+
+/* Day Breakdown Sub-Blocks & Pillars in Dark Mode */
+html.dark .bg-sand-50\/50,
+html.dark .bg-sand-50\/40,
+html.dark .bg-sand-50\/70,
+html.dark .bg-sand-50\/80 {
+  background-color: #1c2128 !important;
+}
+
+html.dark .border-sand-100,
+html.dark .border-sand-200\/50,
+html.dark .border-sand-200\/60,
+html.dark .border-sand-200\/70,
+html.dark .border-sand-200\/80,
+html.dark .border-sand-200\/90 {
+  border-color: #30363d !important;
+}
+
+/* Inactive / Pending Day Breakdown Sub-blocks */
+html.dark .bg-sand-50\/50.text-ink-400 {
+  background-color: #161b22 !important;
+  color: #8b949e !important;
+  border-color: #30363d !important;
+}
+
+html.dark .bg-sand-50\/50.text-ink-400 span,
+html.dark .bg-sand-50\/50.text-ink-400 p {
+  color: #8b949e !important;
+}
+
+/* Active Day Breakdown Sub-blocks */
+html.dark .bg-amber-50\/70,
+html.dark .bg-indigo-50\/70,
+html.dark .bg-teal-50\/70,
+html.dark .bg-emerald-50\/70 {
+  background-color: #1f242c !important;
+}
+
+/* Neuro-Habituation Milestones & Badges */
+html.dark [class*="from-amber-50"][class*="to-white"],
+html.dark [class*="from-amber-50\/60"] {
+  background-image: none !important;
+  background-color: #1f2733 !important;
+  border-color: rgba(245, 158, 11, 0.35) !important;
+}
+
+html.dark .bg-sand-50\/40.border-sand-200 {
+  background-color: #161b22 !important;
+  border-color: #30363d !important;
+  opacity: 0.9 !important;
+}
+
+html.dark .bg-sand-50\/40 h4,
+html.dark .bg-sand-50\/40 .text-ink-900 {
+  color: #f0f6fc !important;
+}
+
+html.dark .bg-sand-50\/40 p,
+html.dark .bg-sand-50\/40 .text-ink-500 {
+  color: #8b949e !important;
+}
+
+html.dark .bg-sand-50\/40 .text-ink-400,
+html.dark .bg-sand-50\/40 div {
+  color: #8b949e;
+}
+
+html.dark .bg-amber-100\/90 {
+  background-color: rgba(245, 158, 11, 0.2) !important;
+}
+
+html.dark span.text-amber-700 {
+  color: #fbbf24 !important;
+}
+
