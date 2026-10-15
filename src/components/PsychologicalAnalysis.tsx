@@ -1,19 +1,21 @@
 import { useState, useEffect } from 'react';
-import { 
-  Sparkles, 
-  BrainCircuit, 
-  ShieldCheck, 
-  Activity, 
-  Lightbulb, 
-  Compass, 
-  Wind, 
-  RefreshCw, 
-  CheckCircle2, 
+import {
+  Sparkles,
+  BrainCircuit,
+  ShieldCheck,
+  Activity,
+  Lightbulb,
+  Compass,
+  Wind,
+  RefreshCw,
+  CheckCircle2,
   Calendar,
   AlertCircle,
   Laptop,
   Settings2,
-  Zap
+  Zap,
+  Copy,
+  Check
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { PsychologicalAnalysisResult, EnergyLog, CBTEntry, TaskItem, BrainDumpItem, FocusSession } from '../types/logs';
@@ -51,6 +53,13 @@ export default function PsychologicalAnalysis({ onStartBreathing, onRefreshTrigg
   const [geminiApiKey, setGeminiApiKey] = useState<string>(() => {
     return localStorage.getItem(LOCAL_STORAGE_GEMINI_KEY) || '';
   });
+  const [copiedCommand, setCopiedCommand] = useState(false);
+
+  const handleCopyTip = (cmd: string) => {
+    navigator.clipboard.writeText(cmd);
+    setCopiedCommand(true);
+    setTimeout(() => setCopiedCommand(false), 2000);
+  };
 
   const [logStats, setLogStats] = useState({
     energyCount: 0,
@@ -181,11 +190,10 @@ export default function PsychologicalAnalysis({ onStartBreathing, onRefreshTrigg
                 <button
                   type="button"
                   onClick={() => setSelectedEngine('local')}
-                  className={`inline-flex items-center gap-1 text-[11px] font-medium px-2.5 py-1 rounded-full transition-all ${
-                    selectedEngine === 'local'
+                  className={`inline-flex items-center gap-1 text-[11px] font-medium px-2.5 py-1 rounded-full transition-all ${selectedEngine === 'local'
                       ? 'bg-white text-sage-900 shadow-xs border border-sage-300 font-semibold'
                       : 'text-ink-600 hover:text-ink-900'
-                  }`}
+                    }`}
                   title="Run offline on Apple Silicon M4 Pro using Ollama"
                 >
                   <Laptop size={12} className={selectedEngine === 'local' ? 'text-sage-600' : 'text-ink-400'} />
@@ -195,11 +203,10 @@ export default function PsychologicalAnalysis({ onStartBreathing, onRefreshTrigg
                 <button
                   type="button"
                   onClick={() => setSelectedEngine('cloud')}
-                  className={`inline-flex items-center gap-1 text-[11px] font-medium px-2.5 py-1 rounded-full transition-all ${
-                    selectedEngine === 'cloud'
+                  className={`inline-flex items-center gap-1 text-[11px] font-medium px-2.5 py-1 rounded-full transition-all ${selectedEngine === 'cloud'
                       ? 'bg-white text-amber-900 shadow-xs border border-amber-300 font-semibold'
                       : 'text-ink-600 hover:text-ink-900'
-                  }`}
+                    }`}
                   title="Run in Google Cloud using Gemini 2.5 Flash"
                 >
                   <Sparkles size={12} className={selectedEngine === 'cloud' ? 'text-amber-500' : 'text-ink-400'} />
@@ -209,11 +216,10 @@ export default function PsychologicalAnalysis({ onStartBreathing, onRefreshTrigg
                 <button
                   type="button"
                   onClick={() => setSelectedEngine('auto')}
-                  className={`inline-flex items-center gap-1 text-[11px] font-medium px-2 py-1 rounded-full transition-all ${
-                    selectedEngine === 'auto'
+                  className={`inline-flex items-center gap-1 text-[11px] font-medium px-2 py-1 rounded-full transition-all ${selectedEngine === 'auto'
                       ? 'bg-white text-lavender-900 shadow-xs border border-lavender-300 font-semibold'
                       : 'text-ink-600 hover:text-ink-900'
-                  }`}
+                    }`}
                   title="Auto mode: Try Local first, seamlessly fallback to Gemini"
                 >
                   <Zap size={12} className={selectedEngine === 'auto' ? 'text-lavender-600' : 'text-ink-400'} />
@@ -313,8 +319,12 @@ export default function PsychologicalAnalysis({ onStartBreathing, onRefreshTrigg
         >
           <AlertCircle size={20} className="mt-0.5 shrink-0 text-amber-600 dark:text-amber-400" />
           <div className="flex-1 min-w-0">
-            <p className="font-semibold text-amber-950 dark:text-amber-200">Could not generate analysis</p>
-            <p className="text-xs text-amber-800 dark:text-amber-300/90 mt-1 leading-relaxed break-words">{error}</p>
+            <p className="analysis-error-title font-bold text-amber-950 dark:text-amber-200 text-sm">
+              Could not generate analysis
+            </p>
+            <p className="analysis-error-desc text-xs text-amber-900 dark:text-amber-300 mt-1 leading-relaxed break-words">
+              {error}
+            </p>
             {selectedEngine === 'local' && (
               <div className="analysis-error-tip mt-2.5 text-xs p-2.5 rounded-xl font-mono flex flex-wrap items-center justify-between gap-2">
                 <span className="flex items-center gap-1.5 flex-wrap">
@@ -327,11 +337,21 @@ export default function PsychologicalAnalysis({ onStartBreathing, onRefreshTrigg
                 </span>
                 <button
                   type="button"
-                  onClick={() => navigator.clipboard.writeText(`ollama run ${localModel}`)}
-                  className="shrink-0 text-[11px] font-sans font-medium px-2 py-0.5 rounded-md bg-amber-500/20 hover:bg-amber-500/30 text-amber-950 dark:text-amber-200 border border-amber-500/30 transition-colors cursor-pointer"
+                  onClick={() => handleCopyTip(`ollama run ${localModel}`)}
+                  className="analysis-copy-btn shrink-0 text-[11px] font-sans px-2.5 py-1 rounded-md transition-all cursor-pointer flex items-center gap-1 shadow-xs"
                   title="Copy command to clipboard"
                 >
-                  Copy
+                  {copiedCommand ? (
+                    <>
+                      <Check size={12} className="text-emerald-500 dark:text-emerald-400" />
+                      <span>Copied!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy size={12} />
+                      <span>Copy</span>
+                    </>
+                  )}
                 </button>
               </div>
             )}
