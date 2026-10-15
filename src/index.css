@@ -82,18 +82,113 @@ html.dark .text-ink-700 {
 }
 
 html.dark .text-ink-600 {
-  color: #8b949e !important;
+  color: #a5b4c4 !important;
 }
 
 html.dark .text-ink-500 {
+  color: #8b949e !important;
+}
+
+html.dark .text-ink-400 {
+  color: #8b949e !important;
+}
+
+/* Make dark badge text bright and readable */
+html.dark .text-emerald-800,
+html.dark .text-emerald-900,
+html.dark .text-emerald-700 {
+  color: #34d399 !important;
+}
+
+html.dark .text-amber-800,
+html.dark .text-amber-900,
+html.dark .text-amber-700 {
+  color: #fbbf24 !important;
+}
+
+html.dark .text-purple-800,
+html.dark .text-purple-900,
+html.dark .text-purple-700 {
+  color: #c084fc !important;
+}
+
+html.dark .text-rose-800,
+html.dark .text-rose-900,
+html.dark .text-rose-700 {
+  color: #fb7185 !important;
+}
+
+html.dark .text-indigo-800,
+html.dark .text-indigo-900,
+html.dark .text-indigo-700 {
+  color: #818cf8 !important;
+}
+
+html.dark .text-lavender-900,
+html.dark .text-lavender-800 {
+  color: #ddd6fe !important;
+}
+
+/* Brighten Lucide icons in dark mode */
+html.dark svg.text-ink-400,
+html.dark svg.text-ink-500 {
+  color: #94a3b8 !important;
+}
+
+html.dark svg.text-emerald-600 {
+  color: #34d399 !important;
+}
+
+html.dark svg.text-amber-600 {
+  color: #fbbf24 !important;
+}
+
+html.dark svg.text-purple-600 {
+  color: #c084fc !important;
+}
+
+html.dark svg.text-sage-600 {
+  color: #6ee7b7 !important;
+}
+
+/* Inputs and textareas */
+html.dark input,
+html.dark textarea,
+html.dark select {
+  background-color: #0d1117 !important;
+  color: #f0f6fc !important;
+  border-color: #30363d !important;
+}
+
+html.dark input::placeholder,
+html.dark textarea::placeholder {
   color: #6e7681 !important;
 }
 
 html.dark .border-sand-200,
 html.dark .border-sand-200\/90,
 html.dark .border-sand-200\/80,
-html.dark .border-sand-300 {
+html.dark .border-sand-300,
+html.dark .border-sand-100 {
   border-color: #30363d !important;
+}
+
+html.dark .border-emerald-200,
+html.dark .border-emerald-200\/90,
+html.dark .border-emerald-200\/80 {
+  border-color: rgba(16, 185, 129, 0.3) !important;
+}
+
+html.dark .border-amber-200,
+html.dark .border-amber-200\/90,
+html.dark .border-amber-200\/80 {
+  border-color: rgba(245, 158, 11, 0.3) !important;
+}
+
+html.dark .border-purple-200,
+html.dark .border-purple-200\/90,
+html.dark .border-purple-100 {
+  border-color: rgba(168, 85, 247, 0.3) !important;
 }
 
 html.dark .bg-sand-50,
@@ -102,22 +197,38 @@ html.dark .bg-sand-100 {
   background-color: #21262d !important;
 }
 
+html.dark .hover\:bg-sand-100:hover,
+html.dark .hover\:bg-sand-50:hover,
+html.dark .hover\:bg-sand-200:hover {
+  background-color: #30363d !important;
+}
+
 html.dark .bg-sage-50,
 html.dark .bg-sage-50\/70,
 html.dark .bg-sage-100 {
-  background-color: rgba(16, 185, 129, 0.12) !important;
+  background-color: rgba(16, 185, 129, 0.15) !important;
+}
+
+html.dark .bg-emerald-50,
+html.dark .bg-emerald-100 {
+  background-color: rgba(16, 185, 129, 0.15) !important;
 }
 
 html.dark .bg-amber-50,
 html.dark .bg-amber-50\/80,
 html.dark .bg-amber-100 {
-  background-color: rgba(245, 158, 11, 0.12) !important;
+  background-color: rgba(245, 158, 11, 0.15) !important;
 }
 
 html.dark .bg-purple-50,
 html.dark .bg-purple-50\/30,
 html.dark .bg-purple-100 {
-  background-color: rgba(168, 85, 247, 0.12) !important;
+  background-color: rgba(168, 85, 247, 0.15) !important;
+}
+
+html.dark .bg-lavender-50,
+html.dark .bg-lavender-100 {
+  background-color: rgba(139, 92, 246, 0.15) !important;
 }
 
 html.dark .glass-card {
