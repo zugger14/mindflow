@@ -55,8 +55,8 @@ export default function MoodEnergyTrend({ onRefreshTrigger, onOpenArchiveForDate
       const formattedDate = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
       const log = energyLogs.find((l) => l.date === dateStr);
-      const emotion = log ? log.emotion : 50;
-      const energy = log ? log.energy : 50;
+      const emotion = log ? log.emotion : 0;
+      const energy = log ? log.energy : 0;
       const note = log?.note;
 
       const matchedTasks = tasks.filter((t) => {
@@ -93,21 +93,25 @@ export default function MoodEnergyTrend({ onRefreshTrigger, onOpenArchiveForDate
   const correlationInsights = useMemo(() => {
     if (!trendData.length) return null;
 
-    const daysWithTasks = trendData.filter((d) => d.tasksCompletedCount > 0);
-    const daysWithoutTasks = trendData.filter((d) => d.tasksCompletedCount === 0);
+    const loggedDays = trendData.filter((d) => d.emotion > 0 || d.energy > 0);
+    const hasAnyLogs = loggedDays.length > 0;
+
+    const daysWithTasks = loggedDays.filter((d) => d.tasksCompletedCount > 0);
+    const daysWithoutTasks = loggedDays.filter((d) => d.tasksCompletedCount === 0);
 
     const avgMoodWithTasks = daysWithTasks.length
       ? Math.round(daysWithTasks.reduce((acc, d) => acc + d.emotion, 0) / daysWithTasks.length)
-      : 50;
+      : 0;
     const avgMoodWithoutTasks = daysWithoutTasks.length
       ? Math.round(daysWithoutTasks.reduce((acc, d) => acc + d.emotion, 0) / daysWithoutTasks.length)
-      : 50;
+      : 0;
 
     const moodDiff = avgMoodWithTasks - avgMoodWithoutTasks;
-    const divergenceDay = trendData.find((d) => d.energy >= 60 && d.emotion <= 48);
-    const peakMoodDay = [...trendData].sort((a, b) => b.emotion - a.emotion)[0];
+    const divergenceDay = loggedDays.find((d) => d.energy >= 60 && d.emotion <= 48);
+    const peakMoodDay = hasAnyLogs ? [...loggedDays].sort((a, b) => b.emotion - a.emotion)[0] : null;
 
     return {
+      hasAnyLogs,
       moodDiff,
       avgMoodWithTasks,
       avgMoodWithoutTasks,
@@ -360,12 +364,18 @@ export default function MoodEnergyTrend({ onRefreshTrigger, onOpenArchiveForDate
                 Task-Mood Lift
               </span>
             </div>
-            <p className="text-xs text-ink-800 leading-relaxed font-light">
-              On days with completed priority tasks, your emotional state averaged{' '}
-              <strong className="text-emerald-700 font-bold">{correlationInsights.avgMoodWithTasks}%</strong>, compared to{' '}
-              <span className="text-ink-600 font-medium">{correlationInsights.avgMoodWithoutTasks}%</span> on low-completion days{' '}
-              ({correlationInsights.moodDiff >= 0 ? `+${correlationInsights.moodDiff}%` : `${correlationInsights.moodDiff}%`}).
-            </p>
+            {correlationInsights.hasAnyLogs ? (
+              <p className="text-xs text-ink-800 leading-relaxed font-light">
+                On days with completed priority tasks, your emotional state averaged{' '}
+                <strong className="text-emerald-700 font-bold">{correlationInsights.avgMoodWithTasks}%</strong>, compared to{' '}
+                <span className="text-ink-600 font-medium">{correlationInsights.avgMoodWithoutTasks}%</span> on low-completion days{' '}
+                ({correlationInsights.moodDiff >= 0 ? `+${correlationInsights.moodDiff}%` : `${correlationInsights.moodDiff}%`}).
+              </p>
+            ) : (
+              <p className="text-xs text-ink-800 leading-relaxed font-light">
+                No logs recorded yet. Begin logging your daily energy and tasks to see how completed priorities lift emotional resonance.
+              </p>
+            )}
             <span className="text-[10px] text-emerald-700 font-medium mt-2 block">
               Cognitive closure reduces rumination and stimulates dopamine reward pathways.
             </span>
@@ -385,9 +395,13 @@ export default function MoodEnergyTrend({ onRefreshTrigger, onOpenArchiveForDate
                 {correlationInsights.divergenceDay.energy}%) alongside subdued mood (
                 {correlationInsights.divergenceDay.emotion}%).
               </p>
+            ) : correlationInsights.hasAnyLogs ? (
+              <p className="text-xs text-ink-800 leading-relaxed font-light">
+                Energy levels and emotional valence are moving in harmonic synchrony across your logged days.
+              </p>
             ) : (
               <p className="text-xs text-ink-800 leading-relaxed font-light">
-                Energy levels and emotional valence are moving in harmonic synchrony across your 7-day window.
+                Awaiting check-in data. Will detect somatic disparity between high energy and subdued mood automatically.
               </p>
             )}
             <span className="text-[10px] text-purple-700 font-medium mt-2 block">
@@ -411,7 +425,7 @@ export default function MoodEnergyTrend({ onRefreshTrigger, onOpenArchiveForDate
               </p>
             ) : (
               <p className="text-xs text-ink-800 leading-relaxed font-light">
-                Tracking consistent baseline. Continue logging daily to refine pattern detection.
+                Awaiting first check-in. Continue logging daily to detect your weekly optimal grounding peak.
               </p>
             )}
             <span className="text-[10px] text-amber-700 font-medium mt-2 block">
