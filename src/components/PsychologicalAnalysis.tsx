@@ -309,21 +309,36 @@ export default function PsychologicalAnalysis({ onStartBreathing, onRefreshTrigg
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="my-4 p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-sm flex items-start gap-3"
+          className="analysis-error-banner my-4 p-4 rounded-2xl text-sm flex items-start gap-3 shadow-xs"
         >
-          <AlertCircle size={18} className="mt-0.5 shrink-0 text-amber-700" />
-          <div className="flex-1">
-            <p className="font-medium">Could not generate analysis</p>
-            <p className="text-xs text-amber-800 mt-1 leading-relaxed">{error}</p>
+          <AlertCircle size={20} className="mt-0.5 shrink-0 text-amber-600 dark:text-amber-400" />
+          <div className="flex-1 min-w-0">
+            <p className="font-semibold text-amber-950 dark:text-amber-200">Could not generate analysis</p>
+            <p className="text-xs text-amber-800 dark:text-amber-300/90 mt-1 leading-relaxed break-words">{error}</p>
             {selectedEngine === 'local' && (
-              <div className="mt-2 text-xs bg-white/70 p-2 rounded-lg border border-amber-300 font-mono text-ink-800">
-                Tip: Run <code className="font-bold">ollama run {localModel}</code> in your Mac Terminal.
+              <div className="analysis-error-tip mt-2.5 text-xs p-2.5 rounded-xl font-mono flex flex-wrap items-center justify-between gap-2">
+                <span className="flex items-center gap-1.5 flex-wrap">
+                  <span className="text-amber-800 dark:text-amber-400 font-bold font-sans">Tip:</span>
+                  <span>Run</span>
+                  <code className="font-bold px-1.5 py-0.5 rounded border text-xs select-all">
+                    ollama run {localModel}
+                  </code>
+                  <span>in your Mac Terminal.</span>
+                </span>
+                <button
+                  type="button"
+                  onClick={() => navigator.clipboard.writeText(`ollama run ${localModel}`)}
+                  className="shrink-0 text-[11px] font-sans font-medium px-2 py-0.5 rounded-md bg-amber-500/20 hover:bg-amber-500/30 text-amber-950 dark:text-amber-200 border border-amber-500/30 transition-colors cursor-pointer"
+                  title="Copy command to clipboard"
+                >
+                  Copy
+                </button>
               </div>
             )}
           </div>
           <button
             onClick={() => setIsConfigOpen(true)}
-            className="text-xs bg-amber-200 hover:bg-amber-300 px-3 py-1.5 rounded-lg font-medium transition-colors"
+            className="analysis-check-setup-btn text-xs px-3.5 py-1.5 rounded-xl font-bold transition-all shrink-0 cursor-pointer"
           >
             Check Setup
           </button>
