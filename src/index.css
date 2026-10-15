@@ -603,4 +603,54 @@ html.dark input[type="range"].bg-sand-200 {
   background-color: #334155 !important;
 }
 
+/* Contextual Bridge: "Offloaded mental clutter converts directly into tasks..." */
+html.dark .bg-violet-50\/70 {
+  background-color: #171526 !important;
+  border-color: rgba(168, 85, 247, 0.35) !important;
+  color: #e2e8f0 !important;
+}
+
+html.dark .bg-violet-50\/70 span,
+html.dark .bg-violet-50\/70 p {
+  color: #e2e8f0 !important;
+}
+
+html.dark .bg-violet-50\/70 svg.text-violet-600 {
+  color: #c084fc !important;
+}
+
+/* Circadian Rhythm Tip Cards: "Low Vitality", "Peak Energy", etc. */
+html.dark .bg-violet-50\/70 span.text-violet-900 {
+  color: #d8b4fe !important;
+  font-weight: 600 !important;
+}
+
+html.dark .bg-amber-50\/70 {
+  background-color: #211c14 !important;
+  border-color: rgba(245, 158, 11, 0.35) !important;
+  color: #e2e8f0 !important;
+}
+
+html.dark .bg-amber-50\/70 span.text-amber-900 {
+  color: #fde047 !important;
+  font-weight: 600 !important;
+}
+
+html.dark .bg-amber-50\/70 span,
+html.dark .bg-amber-50\/70 div {
+  color: #e2e8f0 !important;
+}
+
+html.dark .space-y-3.text-ink-600 .bg-sand-50 {
+  background-color: #161b22 !important;
+  border-color: #30363d !important;
+  color: #e2e8f0 !important;
+}
+
+html.dark .space-y-3.text-ink-600 .bg-sand-50 span.text-ink-900 {
+  color: #f0f6fc !important;
+  font-weight: 600 !important;
+}
+
+
 
