@@ -29,9 +29,9 @@ export default function UserAuthPill() {
         <button
           onClick={loginWithGoogle}
           className="flex items-center gap-2 text-xs font-semibold bg-white hover:bg-sand-50 text-ink-800 px-3 py-1.5 rounded-2xl border border-sand-200/90 shadow-2xs transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
-          title="Sign in with Google to backup data to Firestore"
+          title="Sign in with Google: Your entries save locally on input and automatically backup to Firestore across devices."
         >
-          <svg className="w-3.5 h-3.5" viewBox="0 0 24 24">
+          <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24">
             <path
               fill="#4285F4"
               d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.66v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.15z"
@@ -49,7 +49,10 @@ export default function UserAuthPill() {
               d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"
             />
           </svg>
-          <span>Sign In</span>
+          <span>Sign In with Google</span>
+          <span className="hidden sm:inline-block text-[10px] text-ink-500 font-normal border-l border-sand-300 pl-2">
+            Auto-syncs on input
+          </span>
         </button>
       </div>
     );

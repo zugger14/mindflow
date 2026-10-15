@@ -13,7 +13,9 @@ import {
   ArrowRight,
   ShieldCheck,
   TrendingUp,
-  Volume2
+  Volume2,
+  Sun,
+  Moon
 } from 'lucide-react';
 import UltradianTimer from './components/UltradianTimer';
 import TaskManager from './components/TaskManager';
@@ -40,6 +42,27 @@ function DashboardContent() {
   const [isBreakMode, setIsBreakMode] = useState(false);
   const [isArchiveOpen, setIsArchiveOpen] = useState(false);
   const [archiveDate, setArchiveDate] = useState<string | undefined>(undefined);
+
+  // Dark mode state
+  const [isDark, setIsDark] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('mindflow_theme');
+      if (saved) return saved === 'dark';
+      return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    const root = document.documentElement;
+    if (isDark) {
+      root.classList.add('dark');
+      localStorage.setItem('mindflow_theme', 'dark');
+    } else {
+      root.classList.remove('dark');
+      localStorage.setItem('mindflow_theme', 'light');
+    }
+  }, [isDark]);
 
   useEffect(() => {
     setRefreshTrigger((prev) => prev + 1);
@@ -97,12 +120,32 @@ function DashboardContent() {
             </div>
           </div>
           <p className="text-xs md:text-sm text-ink-600 max-w-2xl font-light">
-            Intent-driven wellness and productivity. Categorized into 4 scientific pillars so you focus on one mental state at a time.
+            Intent-driven wellness and productivity across 4 cognitive pillars. Starts clean—data saves automatically as you input, with optional Google Sign In for seamless cloud sync across all your devices.
           </p>
         </div>
 
-        {/* Header Right Actions: User Auth + Past Archive */}
+        {/* Header Right Actions: Dark Mode + User Auth + Past Archive */}
         <div className="flex items-center gap-2.5 flex-wrap self-start lg:self-auto">
+          {/* Dark Mode Toggle Button */}
+          <button
+            onClick={() => setIsDark((prev) => !prev)}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-2xl bg-white/90 backdrop-blur-md border border-sand-200/90 text-ink-700 hover:text-amber-600 hover:border-amber-300 shadow-2xs transition-all cursor-pointer"
+            title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
+            aria-label="Toggle Dark Mode"
+          >
+            {isDark ? (
+              <>
+                <Sun size={13} className="text-amber-500 animate-spin-slow" />
+                <span>Light</span>
+              </>
+            ) : (
+              <>
+                <Moon size={13} className="text-indigo-500" />
+                <span>Dark</span>
+              </>
+            )}
+          </button>
+
           {/* History Archive Button */}
           <button
             onClick={() => {

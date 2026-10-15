@@ -539,23 +539,23 @@ export function setStoredData<T>(key: string, data: T): void {
 }
 
 export const StorageService = {
-  getEnergyLogs: (): EnergyLog[] => getStoredData(STORAGE_KEYS.ENERGY_LOGS, DEFAULT_ENERGY_LOGS),
+  getEnergyLogs: (): EnergyLog[] => getStoredData(STORAGE_KEYS.ENERGY_LOGS, []),
   saveEnergyLogs: (logs: EnergyLog[]) => setStoredData(STORAGE_KEYS.ENERGY_LOGS, logs),
 
-  getCBTEntries: (): CBTEntry[] => getStoredData(STORAGE_KEYS.CBT_ENTRIES, DEFAULT_CBT_ENTRIES),
+  getCBTEntries: (): CBTEntry[] => getStoredData(STORAGE_KEYS.CBT_ENTRIES, []),
   saveCBTEntries: (entries: CBTEntry[]) => setStoredData(STORAGE_KEYS.CBT_ENTRIES, entries),
 
-  getTasks: (): TaskItem[] => getStoredData(STORAGE_KEYS.TASKS, DEFAULT_TASKS),
+  getTasks: (): TaskItem[] => getStoredData(STORAGE_KEYS.TASKS, []),
   saveTasks: (tasks: TaskItem[]) => setStoredData(STORAGE_KEYS.TASKS, tasks),
 
-  getBrainDump: (): BrainDumpItem[] => getStoredData(STORAGE_KEYS.BRAIN_DUMP, DEFAULT_BRAIN_DUMP),
+  getBrainDump: (): BrainDumpItem[] => getStoredData(STORAGE_KEYS.BRAIN_DUMP, []),
   saveBrainDump: (items: BrainDumpItem[]) => setStoredData(STORAGE_KEYS.BRAIN_DUMP, items),
 
-  getFocusSessions: (): FocusSession[] => getStoredData(STORAGE_KEYS.FOCUS_SESSIONS, DEFAULT_FOCUS_SESSIONS),
+  getFocusSessions: (): FocusSession[] => getStoredData(STORAGE_KEYS.FOCUS_SESSIONS, []),
   saveFocusSessions: (sessions: FocusSession[]) => setStoredData(STORAGE_KEYS.FOCUS_SESSIONS, sessions),
 
   // Focus Achievements (Badges for 90-min Ultradian blocks)
-  getFocusAchievements: (): FocusAchievement[] => getStoredData(STORAGE_KEYS.FOCUS_ACHIEVEMENTS, DEFAULT_FOCUS_ACHIEVEMENTS),
+  getFocusAchievements: (): FocusAchievement[] => getStoredData(STORAGE_KEYS.FOCUS_ACHIEVEMENTS, []),
   saveFocusAchievements: (badges: FocusAchievement[]) => setStoredData(STORAGE_KEYS.FOCUS_ACHIEVEMENTS, badges),
 
   // Award an achievement upon completing a 90-minute Ultradian focus block
