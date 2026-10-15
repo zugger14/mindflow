@@ -235,6 +235,166 @@ html.dark .glass-card {
   background: rgba(22, 27, 34, 0.88) !important;
 }
 
+/* Ambient Soundscapes Dark Mode Enhancements */
+html.dark [class*="from-sky-50"],
+html.dark [class*="from-emerald-50"],
+html.dark [class*="from-amber-50"],
+html.dark [class*="from-cyan-50"],
+html.dark [class*="from-purple-50"],
+html.dark [class*="from-indigo-50"],
+html.dark [class*="from-violet-50"] {
+  background-image: none !important;
+  background-color: #1c2128 !important;
+}
+
+/* Playing sound card styling */
+html.dark .ring-emerald-300\/40,
+html.dark .ring-emerald-300 {
+  --tw-ring-color: rgba(52, 211, 153, 0.45) !important;
+  background-color: #1f2733 !important;
+}
+
+/* Ambient soundscape badge backgrounds */
+html.dark .bg-sky-100 {
+  background-color: rgba(56, 189, 248, 0.18) !important;
+}
+html.dark .bg-cyan-100 {
+  background-color: rgba(34, 211, 238, 0.18) !important;
+}
+html.dark .bg-teal-100 {
+  background-color: rgba(45, 212, 191, 0.18) !important;
+}
+
+/* High contrast text colors for badges, titles and labels */
+html.dark .text-sky-700,
+html.dark .text-sky-800,
+html.dark .text-sky-900 {
+  color: #38bdf8 !important;
+}
+
+html.dark .text-cyan-700,
+html.dark .text-cyan-800,
+html.dark .text-cyan-900 {
+  color: #22d3ee !important;
+}
+
+html.dark .text-teal-700,
+html.dark .text-teal-800,
+html.dark .text-teal-900 {
+  color: #2dd4bf !important;
+}
+
+html.dark .text-orange-700,
+html.dark .text-orange-800,
+html.dark .text-orange-900 {
+  color: #fb923c !important;
+}
+
+html.dark .text-violet-700,
+html.dark .text-violet-800,
+html.dark .text-violet-900 {
+  color: #c084fc !important;
+}
+
+html.dark .text-sage-800,
+html.dark .text-sage-900 {
+  color: #6ee7b7 !important;
+}
+
+/* Borders in dark mode */
+html.dark .border-sky-200,
+html.dark .border-cyan-200,
+html.dark .border-teal-200,
+html.dark .border-orange-200,
+html.dark .border-violet-200 {
+  border-color: rgba(148, 163, 184, 0.25) !important;
+}
+
+/* Quick mix buttons & presets in Ambient section */
+html.dark [class*="bg-gradient-to-r"][class*="from-sky-50"],
+html.dark [class*="bg-gradient-to-r"][class*="from-emerald-50"],
+html.dark [class*="bg-gradient-to-r"][class*="from-cyan-50"],
+html.dark [class*="bg-gradient-to-r"][class*="from-sand-50"],
+html.dark [class*="bg-gradient-to-r"][class*="from-sand-100"] {
+  background-image: none !important;
+  background-color: #21262d !important;
+  color: #e6edf3 !important;
+  border-color: #30363d !important;
+}
+
+html.dark [class*="bg-gradient-to-r"][class*="from-sky-50"]:hover,
+html.dark [class*="bg-gradient-to-r"][class*="from-emerald-50"]:hover,
+html.dark [class*="bg-gradient-to-r"][class*="from-cyan-50"]:hover {
+  background-color: #30363d !important;
+}
+
+/* Play/Pause and side buttons */
+html.dark .bg-sand-100.text-ink-700,
+html.dark .bg-sand-50.text-ink-700,
+html.dark button.bg-white.text-ink-700,
+html.dark button.bg-sand-50,
+html.dark button.bg-sand-100 {
+  background-color: #21262d !important;
+  color: #e6edf3 !important;
+  border-color: #30363d !important;
+}
+
+html.dark button.bg-sand-100:hover,
+html.dark button.bg-sand-50:hover,
+html.dark button.bg-white:hover {
+  background-color: #30363d !important;
+  color: #ffffff !important;
+}
+
+/* Dark mode inputs, textareas, and search boxes */
+html.dark input[type="text"],
+html.dark input[type="number"],
+html.dark input[type="date"],
+html.dark textarea,
+html.dark select {
+  background-color: #0d1117 !important;
+  color: #f0f6fc !important;
+  border-color: #30363d !important;
+}
+
+html.dark input[type="text"]:focus,
+html.dark input[type="number"]:focus,
+html.dark input[type="date"]:focus,
+html.dark textarea:focus {
+  background-color: #161b22 !important;
+  border-color: #10b981 !important;
+  outline: none !important;
+}
+
+/* Sliders tracks and thumbs */
+html.dark input[type="range"] {
+  background-color: #30363d !important;
+}
+
+/* Active Segmented Pill Buttons (e.g. LLM Engine buttons, mode switchers) */
+html.dark button.bg-white.text-sage-900,
+html.dark button.bg-white.text-amber-900,
+html.dark button.bg-white.text-lavender-900,
+html.dark button.bg-white.text-ink-900 {
+  background-color: #21262d !important;
+  border-color: #484f58 !important;
+  color: #f0f6fc !important;
+}
+
+/* Header buttons & Pill toggles */
+html.dark .bg-sand-100\/70 {
+  background-color: #161b22 !important;
+}
+
+html.dark .bg-sand-200,
+html.dark .bg-sand-200\/60 {
+  background-color: #2d333b !important;
+}
+
+html.dark .bg-sand-300 {
+  background-color: #373e47 !important;
+}
+
 /* Custom sleek scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
