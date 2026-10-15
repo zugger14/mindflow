@@ -109,7 +109,14 @@ export default function HabitsAndTrendsHub({
   // 7-day average vitality calculation
   const vitalitySummary = useMemo(() => {
     const recent = recentEnergyLogs.slice(0, 7);
-    if (recent.length === 0) return { avgEnergy: 65, avgEmotion: 68, trend: 'Optimal' };
+    if (recent.length === 0) {
+      return { 
+        hasLogs: false,
+        avgEnergy: 0, 
+        avgEmotion: 0, 
+        trend: 'No logs yet' 
+      };
+    }
     const avgEnergy = Math.round(recent.reduce((acc, l) => acc + l.energy, 0) / recent.length);
     const avgEmotion = Math.round(recent.reduce((acc, l) => acc + l.emotion, 0) / recent.length);
     
@@ -117,7 +124,7 @@ export default function HabitsAndTrendsHub({
     if (avgEnergy >= 75) trend = 'High Vitality';
     else if (avgEnergy <= 45 && avgEmotion <= 50) trend = 'Rest Needed';
 
-    return { avgEnergy, avgEmotion, trend };
+    return { hasLogs: true, avgEnergy, avgEmotion, trend };
   }, [recentEnergyLogs]);
 
   // Next milestone calculation
@@ -227,17 +234,23 @@ export default function HabitsAndTrendsHub({
               Vitality Pulse
             </span>
             <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200/60">
-              7-Day Mean
+              {vitalitySummary.hasLogs ? '7-Day Mean' : 'No Data'}
             </span>
           </div>
           <div className="flex items-baseline gap-2">
             <span className="text-2xl md:text-3xl font-serif font-bold text-ink-900">
-              {vitalitySummary.avgEnergy}
+              {vitalitySummary.hasLogs ? vitalitySummary.avgEnergy : '—'}
             </span>
-            <span className="text-xs text-ink-500">/ 100 energy avg</span>
+            <span className="text-xs text-ink-500">
+              {vitalitySummary.hasLogs ? '/ 100 energy avg' : 'awaiting check-in'}
+            </span>
           </div>
           <div className="text-[11px] text-ink-500 mt-1 flex items-center justify-between">
-            <span>Mood {vitalitySummary.avgEmotion}/100 · {vitalitySummary.trend}</span>
+            <span>
+              {vitalitySummary.hasLogs 
+                ? `Mood ${vitalitySummary.avgEmotion}/100 · ${vitalitySummary.trend}`
+                : 'Log energy to begin baseline'}
+            </span>
             <span className="text-emerald-700 opacity-0 group-hover:opacity-100 transition-opacity font-medium">View Trends →</span>
           </div>
         </div>
@@ -253,17 +266,19 @@ export default function HabitsAndTrendsHub({
               Cognitive State
             </span>
             <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-violet-50 text-violet-800 border border-violet-200/60">
-              AI Synthesis
+              {savedAnalysis ? 'AI Synthesis' : 'Pending'}
             </span>
           </div>
           <div className="text-sm md:text-base font-semibold text-ink-900 truncate mt-1">
-            {savedAnalysis ? savedAnalysis.mindsetDiagnosis : 'Balanced Flow'}
+            {savedAnalysis ? savedAnalysis.mindsetDiagnosis : 'Awaiting Analysis'}
           </div>
           <div className="text-[11px] text-ink-500 mt-1.5 flex items-center justify-between">
             <span className="truncate">
               {savedAnalysis?.riskFlags && savedAnalysis.riskFlags.length > 0 
                 ? `⚠️ ${savedAnalysis.riskFlags[0].indicator}` 
-                : 'Shield active: Low burnout'}
+                : savedAnalysis 
+                ? 'Shield active: Low burnout'
+                : 'Run analysis after day logs'}
             </span>
             <span className="text-violet-700 opacity-0 group-hover:opacity-100 transition-opacity font-medium">Insights →</span>
           </div>
